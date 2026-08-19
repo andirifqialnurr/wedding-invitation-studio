@@ -2,7 +2,7 @@
 
 import { CSSProperties, FormEvent, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
 
-type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth";
+type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth" | "garden";
 type Theme = { id: ThemeId; number: string; label: string; kicker: string; tagline: string; accent: string; soft: string; collection: "editorial" | "grand" };
 
 const themes: Theme[] = [
@@ -18,6 +18,7 @@ const themes: Theme[] = [
   { id: "orbit", number: "10", label: "Orbit", kicker: "Everything led here", tagline: "A high-energy, editorial invitation built around one beautiful collision.", accent: "#c8b5ff", soft: "#e5ddf6", collection: "grand" },
   { id: "bloom", number: "11", label: "Bloom", kicker: "A garden in motion", tagline: "Watercolor petals, quiet promises, and a day worth gathering for.", accent: "#d77991", soft: "#f3d7df", collection: "grand" },
   { id: "depth", number: "12", label: "Depth", kicker: "A story in layers", tagline: "A modern invitation that opens one frame at a time.", accent: "#b8ff4d", soft: "#dbe8ff", collection: "grand" },
+  { id: "garden", number: "13", label: "Petal Route", kicker: "A garden in motion", tagline: "A floral invitation carried by one winding path.", accent: "#c77484", soft: "#f3e6d9", collection: "grand" },
 ];
 
 const timeline = [
@@ -28,11 +29,11 @@ const timeline = [
 ] as const;
 
 function ThemeSelector({ active, onChange }: { active: ThemeId; onChange: (id: ThemeId) => void }) {
-  return <div className="theme-selector" aria-label="Choose an invitation style"><span className="selector-label">Explore twelve directions</span><div className="theme-pills">{themes.map((theme) => <button className={`theme-pill ${active === theme.id ? "is-active" : ""}`} key={theme.id} onClick={() => onChange(theme.id)} type="button"><span>{theme.number}</span> {theme.label}</button>)}</div></div>;
+  return <div className="theme-selector" aria-label="Choose an invitation style"><span className="selector-label">Explore thirteen directions</span><div className="theme-pills">{themes.map((theme) => <button className={`theme-pill ${active === theme.id ? "is-active" : ""}`} key={theme.id} onClick={() => onChange(theme.id)} type="button"><span>{theme.number}</span> {theme.label}</button>)}</div></div>;
 }
 
 function CarouselArtwork({ theme, compact = false }: { theme: Theme; compact?: boolean }) {
-  return <div className={`carousel-art art-${theme.id} ${compact ? "is-compact" : ""}`}><span className="art-number">{theme.number}</span><span className="art-symbol">{theme.id === "atlas" ? "↗" : theme.id === "luna" ? "☾" : theme.id === "orbit" ? "◎" : theme.id === "gallery" ? "▦" : theme.id === "aurora" ? "✦" : theme.id === "bloom" ? "✿" : theme.id === "depth" ? "◫" : "N + R"}</span></div>;
+  return <div className={`carousel-art art-${theme.id} ${compact ? "is-compact" : ""}`}><span className="art-number">{theme.number}</span><span className="art-symbol">{theme.id === "atlas" ? "↗" : theme.id === "luna" ? "☾" : theme.id === "orbit" ? "◎" : theme.id === "gallery" ? "▦" : theme.id === "aurora" ? "✦" : theme.id === "bloom" ? "✿" : theme.id === "depth" ? "◫" : theme.id === "garden" ? "❊" : "N + R"}</span></div>;
 }
 
 function TemplateCarousel({ active, onChange }: { active: ThemeId; onChange: (id: ThemeId) => void }) {
@@ -41,13 +42,13 @@ function TemplateCarousel({ active, onChange }: { active: ThemeId; onChange: (id
   const next = themes[(activeIndex + 1) % themes.length];
   const select = (theme: Theme) => onChange(theme.id);
   return <section className="template-carousel reveal is-visible" aria-label="Template carousel">
-    <div className="carousel-heading"><div><p className="eyebrow">A marketplace-ready starting point</p><h2>Choose your<br /><i>first impression.</i></h2></div><p className="carousel-description">Ten distinct invitation directions, built with the same flexible content foundation. Swap the template, music, colors, and story later.</p></div>
+    <div className="carousel-heading"><div><p className="eyebrow">A marketplace-ready starting point</p><h2>Choose your<br /><i>first impression.</i></h2></div><p className="carousel-description">Thirteen distinct invitation directions, built with the same flexible content foundation. Swap the template, music, colors, and story later.</p></div>
     <div className="carousel-stage">
       <button className="carousel-side carousel-prev" onClick={() => select(previous)} type="button" aria-label={`Previous template: ${previous.label}`}><CarouselArtwork theme={previous} compact /><span className="side-label">← {previous.label}</span></button>
       <div className={`carousel-feature feature-${active}`}><div className="feature-art"><CarouselArtwork theme={themes[activeIndex]} /><span className="feature-glow" /></div><div className="feature-copy"><div className="feature-topline"><span>{themes[activeIndex].number} / 10</span><span className="collection-label">{themes[activeIndex].collection} collection</span></div><h3>{themes[activeIndex].label}</h3><p>{themes[activeIndex].kicker}</p><button className="feature-cta" onClick={() => (document.getElementById("invitation") ?? document.querySelector(".hero"))?.scrollIntoView({ behavior: "smooth" })} type="button">Preview template <span>↗</span></button></div></div>
       <button className="carousel-side carousel-next" onClick={() => select(next)} type="button" aria-label={`Next template: ${next.label}`}><CarouselArtwork theme={next} compact /><span className="side-label">{next.label} →</span></button>
     </div>
-    <div className="carousel-controls"><button onClick={() => select(previous)} type="button" aria-label="Previous template">←</button><div className="carousel-dots">{themes.map((theme, index) => <button className={active === theme.id ? "is-active" : ""} key={theme.id} onClick={() => select(theme)} type="button" aria-label={`Go to template ${index + 1}`}><span /></button>)}</div><span className="carousel-count">{String(activeIndex + 1).padStart(2, "0")} <i>/ 12</i></span><button onClick={() => select(next)} type="button" aria-label="Next template">→</button></div>
+    <div className="carousel-controls"><button onClick={() => select(previous)} type="button" aria-label="Previous template">←</button><div className="carousel-dots">{themes.map((theme, index) => <button className={active === theme.id ? "is-active" : ""} key={theme.id} onClick={() => select(theme)} type="button" aria-label={`Go to template ${index + 1}`}><span /></button>)}</div><span className="carousel-count">{String(activeIndex + 1).padStart(2, "0")} <i>/ 13</i></span><button onClick={() => select(next)} type="button" aria-label="Next template">→</button></div>
   </section>;
 }
 
@@ -67,6 +68,10 @@ function BloomFloatingOrnaments() {
 
 function DepthHero({ theme }: { theme: Theme }) {
   return <section className="hero grand-hero grand-depth reveal" id="invitation"><div className="depth-hero-grid" /><div className="depth-hero-topline"><span>{theme.number} / Grand collection</span><span>scroll to enter</span></div><div className="depth-hero-copy"><p className="eyebrow">{theme.kicker} · 17.10.26</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="depth-hero-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Open the next frame <span>↓</span></button></div><div className="depth-hero-object"><div className="depth-hero-ring ring-a" /><div className="depth-hero-ring ring-b" /><div className="depth-hero-core"><span>NR</span><small>2026</small></div><span className="depth-hero-index">01 — 12</span></div><div className="depth-hero-footer"><span>THE GLASSHOUSE / UBUD</span><span>EVERYTHING IN ITS PLACE</span></div></section>;
+}
+
+function GardenHero({ theme }: { theme: Theme }) {
+  return <section className="hero grand-hero grand-garden reveal" id="invitation"><div className="garden-hero-wash" /><div className="garden-hero-topline"><span>{theme.number} / Grand collection</span><span>follow the petals</span></div><img className="garden-hero-cluster" src="/assets/flowers/bloom-cluster.png" alt="" /><img className="garden-hero-sprig" src="/assets/flowers/bloom-sprig.png" alt="" /><div className="garden-hero-copy"><p className="eyebrow">{theme.kicker} · 17 October 2026</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="garden-hero-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Enter the garden <span>↘</span></button></div><div className="garden-hero-seal"><span>petal<br />route</span><strong>NR</strong><small>UBUD / 2026</small></div></section>;
 }
 
 function ModernHero({ theme }: { theme: Theme }) {
@@ -106,7 +111,7 @@ function OrbitHero({ theme }: { theme: Theme }) {
 }
 
 function Hero({ theme }: { theme: Theme }) {
-  switch (theme.id) { case "modern": return <ModernHero theme={theme} />; case "film": return <FilmHero theme={theme} />; case "paper": return <PaperHero theme={theme} />; case "quiet": return <QuietHero theme={theme} />; case "aurora": return <AuroraHero theme={theme} />; case "atlas": return <AtlasHero theme={theme} />; case "luna": return <LunaHero theme={theme} />; case "gallery": return <GalleryHero theme={theme} />; case "orbit": return <OrbitHero theme={theme} />; case "bloom": return <BloomHero theme={theme} />; case "depth": return <DepthHero theme={theme} />; default: return <BotanicalHero theme={theme} />; }
+  switch (theme.id) { case "modern": return <ModernHero theme={theme} />; case "film": return <FilmHero theme={theme} />; case "paper": return <PaperHero theme={theme} />; case "quiet": return <QuietHero theme={theme} />; case "aurora": return <AuroraHero theme={theme} />; case "atlas": return <AtlasHero theme={theme} />; case "luna": return <LunaHero theme={theme} />; case "gallery": return <GalleryHero theme={theme} />; case "orbit": return <OrbitHero theme={theme} />; case "bloom": return <BloomHero theme={theme} />; case "depth": return <DepthHero theme={theme} />; case "garden": return <GardenHero theme={theme} />; default: return <BotanicalHero theme={theme} />; }
 }
 
 function Countdown() {
@@ -271,12 +276,73 @@ function DepthBody() {
   return <div className="grand-body grand-body-depth"><DepthFlowGuide active={motion.active} progress={motion.progress} /><section className={`depth-section depth-story-section ${motion.active === 0 ? "is-active" : ""}`} id="story" data-depth-index="0" style={sectionStyle(0)}><div className="depth-section-meta"><span>01 / THE STORY</span><span>keep moving ↓</span></div><div className="depth-section-shape depth-shape-story" /><div className="depth-story-copy depth-motion depth-motion-copy" style={motionStyle(0, -38, 22, -2, .96)}><p className="eyebrow">A modern invitation</p><h2>Start<br /><i>here.</i></h2><p>Five years, one very good idea, and a room full of people who already know why we are here.</p></div><div className="depth-story-stack depth-motion depth-motion-stack" style={motionStyle(0, 38, 34, 3, .95)}><div className="depth-story-back depth-layer-motion" style={motionStyle(0, -18, 14, -3, .98)}>THE<br />BEGINNING</div><div className="depth-story-mid depth-layer-motion" style={motionStyle(0, 12, -22, 4, .98)}><img src="/assets/images/bloom-couple.webp" alt="A couple celebrating together" /><span>THE GLASSHOUSE / 2026</span></div><div className="depth-story-front depth-layer-motion" style={motionStyle(0, -8, 20, -1, .99)}><span>NR / 17.10.26</span><strong>Nara<br /><i>& Raka</i></strong><small>Somewhere between the first hello<br />and the forever after.</small></div></div></section><section className={`depth-section depth-details ${motion.active === 1 ? "is-active" : ""}`} id="details" data-depth-index="1" style={sectionStyle(1)}><div className="depth-section-meta"><span>02 / THE DETAILS</span><span>everything in its place</span></div><div className="depth-section-shape depth-shape-details" /><div className="depth-details-heading depth-motion" style={motionStyle(1, -30, 28, -2, .96)}><p className="eyebrow">Make room for this</p><h2>Everything<br /><i>falls into place.</i></h2></div><div className="depth-detail-grid depth-motion" style={motionStyle(1, 34, 42, 2, .94)}><article style={motionStyle(1, -18, 28, -2, .98)}><span>01 / ARRIVE</span><strong>15:30</strong><p>Find the room, find your people, and settle into the afternoon.</p></article><article style={motionStyle(1, 0, 38, 0, .98)}><span>02 / PROMISE</span><strong>16:00</strong><p>The ceremony begins when the light is exactly right.</p></article><article style={motionStyle(1, 18, 28, 2, .98)}><span>03 / STAY</span><strong>18:30</strong><p>Dinner, dancing, and one more song before the night ends.</p></article></div></section><section className={`depth-section depth-closer ${motion.active === 2 ? "is-active" : ""}`} id="schedule" data-depth-index="2" style={sectionStyle(2)}><div className="depth-section-meta"><span>03 / THE PROGRAMME</span><span>stay for the whole thing</span></div><div className="depth-section-shape depth-shape-schedule" /><div className="depth-closer-mark depth-motion" style={motionStyle(2, -34, 30, -5, .9)}>12<span>—</span>26</div><div className="depth-closer-copy depth-motion" style={motionStyle(2, 34, 24, 2, .96)}><p className="eyebrow">The last frame</p><h2>See you<br /><i>inside.</i></h2><p>Keep a little room in your calendar. We will keep the lights on.</p></div></section><section className={`depth-section depth-final ${motion.active === 3 ? "is-active" : ""}`} id="depth-final" data-depth-index="3" style={sectionStyle(3)}><div className="depth-section-meta"><span>04 / THE AFTERGLOW</span><span>one more frame</span></div><div className="depth-section-shape depth-shape-final" /><div className="depth-final-copy depth-motion" style={motionStyle(3, -30, 26, -2, .96)}><p className="eyebrow">After the ceremony</p><h2>Stay for<br /><i>the good part.</i></h2><p>Vows, dinner, dancing, and all the small details we will remember long after the lights go out.</p></div><span className="depth-final-mark depth-motion" style={motionStyle(3, 28, 20, 3, .94)}>N + R / 2026</span></section></div>;
 }
 
+const gardenRoutePoints = [[17, 7], [82, 24], [82, 57], [19, 75], [19, 94]] as const;
+
+function gardenRoutePoint(progress: number) {
+  const lengths = gardenRoutePoints.slice(1).map((point, index) => Math.hypot(point[0] - gardenRoutePoints[index][0], point[1] - gardenRoutePoints[index][1]));
+  const total = lengths.reduce((sum, length) => sum + length, 0);
+  let distance = Math.max(0, Math.min(total, progress * total));
+  for (let index = 0; index < lengths.length; index += 1) {
+    if (distance <= lengths[index]) { const ratio = lengths[index] ? distance / lengths[index] : 0; return { x: gardenRoutePoints[index][0] + ((gardenRoutePoints[index + 1][0] - gardenRoutePoints[index][0]) * ratio), y: gardenRoutePoints[index][1] + ((gardenRoutePoints[index + 1][1] - gardenRoutePoints[index][1]) * ratio) }; }
+    distance -= lengths[index];
+  }
+  const last = gardenRoutePoints[gardenRoutePoints.length - 1];
+  return { x: last[0], y: last[1] };
+}
+
+function GardenRouteGuide({ active, progress }: { active: number; progress: number }) {
+  const point = gardenRoutePoint(progress);
+  const guideStyle = { "--garden-marker-x": `${point.x}%`, "--garden-marker-y": `${point.y}%`, "--garden-marker-rotation": `${progress * 720}deg` } as CSSProperties;
+  return <div className="garden-route-guide" style={guideStyle} aria-hidden="true"><svg className="garden-route-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path className="garden-route-base" pathLength="1" d="M17 7 L82 24 L82 57 L19 75 L19 94" /><path className="garden-route-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - progress} d="M17 7 L82 24 L82 57 L19 75 L19 94" /></svg>{gardenRoutePoints.slice(0, 4).map(([x, y], index) => <span className={`garden-route-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="garden-marker"><span className="garden-marker-petals">{Array.from({ length: 6 }, (_, index) => <i key={index} style={{ "--garden-petal-angle": `${index * 60}deg` } as CSSProperties} />)}</span><b>✿</b></span><span className="garden-route-caption">one path / four chapters</span></div>;
+}
+
+function GardenBody() {
+  const [motion, setMotion] = useState({ active: 0, progress: 0, reveals: [1, 0, 0, 0] });
+  useEffect(() => {
+    let frame = 0;
+    const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+    const update = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const body = document.querySelector<HTMLElement>(".grand-body-garden");
+        const sections = Array.from(document.querySelectorAll<HTMLElement>(".garden-section"));
+        if (!body || !sections.length) return;
+        const viewport = window.innerHeight;
+        const focus = viewport * .42;
+        const bodyRect = body.getBoundingClientRect();
+        const progress = clamp((focus - bodyRect.top) / Math.max(bodyRect.height - viewport * .18, 1), 0, 1);
+        let active = 0;
+        let distance = Number.POSITIVE_INFINITY;
+        const reveals = sections.map((section, index) => {
+          const rect = section.getBoundingClientRect();
+          const nextDistance = Math.abs(rect.top - focus);
+          if (nextDistance < distance) { distance = nextDistance; active = index; }
+          const entry = clamp((focus - rect.top + viewport * .42) / (viewport * .42), 0, 1);
+          const exit = clamp((rect.bottom - focus + viewport * .18) / (viewport * .35), 0, 1);
+          return Math.min(entry, exit);
+        });
+        const focusedIndex = sections.findIndex((section) => { const rect = section.getBoundingClientRect(); return rect.top <= focus && rect.bottom >= focus; });
+        if (focusedIndex >= 0) active = focusedIndex;
+        setMotion({ active, progress, reveals });
+      });
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); if (frame) window.cancelAnimationFrame(frame); };
+  }, []);
+  const sectionStyle = (index: number) => ({ "--garden-reveal": motion.reveals[index].toFixed(3), "--garden-rotate": `${(1 - motion.reveals[index]) * (index % 2 ? -3 : 3)}deg` } as CSSProperties);
+  const motionStyle = (index: number, x: number, y: number, scale = .96) => { const phase = 1 - (motion.reveals[index] ?? 0); return { "--garden-motion-opacity": .2 + ((1 - phase) * .8), "--garden-motion-x": `${x * phase}px`, "--garden-motion-y": `${y * phase}px`, "--garden-motion-scale": 1 - ((1 - scale) * phase) } as CSSProperties; };
+  return <div className="grand-body grand-body-garden"><GardenRouteGuide active={motion.active} progress={motion.progress} /><section className={`garden-section garden-story ${motion.active === 0 ? "is-active" : ""}`} id="story" style={sectionStyle(0)}><div className="garden-section-meta"><span>01 / THE OPENING</span><span>start on the left</span></div><div className="garden-story-copy garden-motion" style={motionStyle(0, -35, 22)}><p className="eyebrow">A garden in motion</p><h2>Begin where<br /><i>the petals open.</i></h2><p>One path, four chapters, and a day that slowly turns toward the people we love most.</p></div><div className="garden-story-art garden-motion" style={motionStyle(0, 30, 34, .94)}><img src="/assets/flowers/bloom-cluster.png" alt="Watercolor flower cluster" /><span>THE GLASSHOUSE / UBUD</span></div></section><section className={`garden-section garden-details ${motion.active === 1 ? "is-active" : ""}`} id="details" style={sectionStyle(1)}><div className="garden-section-meta"><span>02 / THE DETAILS</span><span>straight through the garden</span></div><div className="garden-details-copy garden-motion" style={motionStyle(1, -30, 25)}><p className="eyebrow">Everything in bloom</p><h2>Make room<br /><i>for the good things.</i></h2></div><div className="garden-detail-list garden-motion" style={motionStyle(1, 30, 35, .95)}><article><span>01 / ARRIVE</span><strong>15:30</strong><p>Find a seat beneath the leaves and settle into the afternoon.</p></article><article><span>02 / PROMISE</span><strong>16:00</strong><p>The ceremony begins when the light turns soft.</p></article><article><span>03 / STAY</span><strong>18:30</strong><p>Dinner, music, and one more song before the night ends.</p></article></div><img className="garden-details-sprig garden-motion" style={motionStyle(1, 18, -20, .9)} src="/assets/flowers/bloom-sprig.png" alt="" /></section><section className={`garden-section garden-schedule ${motion.active === 2 ? "is-active" : ""}`} id="schedule" style={sectionStyle(2)}><div className="garden-section-meta"><span>03 / THE ROUTE</span><span>follow the light</span></div><div className="garden-schedule-art garden-motion" style={motionStyle(2, -28, 30, .92)}><img src="/assets/flowers/bloom-side-purple.png" alt="Watercolor purple flowers" /><span>17 / 10 / 26</span></div><div className="garden-schedule-copy garden-motion" style={motionStyle(2, 32, 24)}><p className="eyebrow">The programme</p><h2>Stay close<br /><i>to the light.</i></h2><div className="garden-schedule-list"><div><time>15:30</time><span>Garden doors open</span></div><div><time>16:00</time><span>The ceremony</span></div><div><time>17:00</time><span>Golden hour portraits</span></div><div><time>18:30</time><span>Dinner under the trees</span></div></div></div></section><section className={`garden-section garden-final ${motion.active === 3 ? "is-active" : ""}`} id="garden-final" style={sectionStyle(3)}><div className="garden-section-meta"><span>04 / THE AFTERGLOW</span><span>return to the left</span></div><img className="garden-final-art garden-motion" style={motionStyle(3, -24, 30, .92)} src="/assets/flowers/bloom-side-leaves.png" alt="Watercolor leaves" /><div className="garden-final-copy garden-motion" style={motionStyle(3, 28, 24)}><p className="eyebrow">The last petal</p><h2>Stay for<br /><i>the afterglow.</i></h2><p>When the path turns home, there will still be music, warm lights, and a little room on the dance floor.</p></div><span className="garden-final-mark garden-motion" style={motionStyle(3, 22, 15)}>N + R / 2026</span></section></div>;
+}
+
 function GrandRsvp({ onOpen }: { onOpen: () => void }) {
   return <section className="grand-rsvp reveal" id="rsvp"><div className="grand-rsvp-ring" /><div className="grand-rsvp-content"><p className="eyebrow">The final chapter is yours</p><h2>Will you<br /><i>be there?</i></h2><p>Save a little room in your calendar and a lot of room on the dance floor.</p><button className="rsvp-button" onClick={onOpen} type="button">Reserve your place <span>↗</span></button></div><span className="grand-rsvp-code">NR—10 / 26</span></section>;
 }
 
 function GrandBody({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
-  return <>{theme.id === "aurora" && <AuroraBody />}{theme.id === "atlas" && <AtlasBody />}{theme.id === "luna" && <LunaBody />}{theme.id === "gallery" && <GalleryBody />}{theme.id === "orbit" && <OrbitBody />}{theme.id === "bloom" && <BloomBody />}{theme.id === "depth" && <DepthBody />}<GrandRsvp onOpen={onOpen} /></>;
+  return <>{theme.id === "aurora" && <AuroraBody />}{theme.id === "atlas" && <AtlasBody />}{theme.id === "luna" && <LunaBody />}{theme.id === "gallery" && <GalleryBody />}{theme.id === "orbit" && <OrbitBody />}{theme.id === "bloom" && <BloomBody />}{theme.id === "depth" && <DepthBody />}{theme.id === "garden" && <GardenBody />}<GrandRsvp onOpen={onOpen} /></>;
 }
 
 function RsvpSection({ onOpen }: { onOpen: () => void }) {
