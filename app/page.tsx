@@ -205,7 +205,6 @@ const depthFlowLookup = (() => {
   });
   return { samples, total: distance };
 })();
-const depthFlowFinalStart = (depthFlowLookup.samples.find((sample) => sample.segment === 3)?.distance ?? 0) / depthFlowLookup.total;
 
 function depthFlowPoint(progress: number) {
   const target = Math.min(depthFlowLookup.total, Math.max(0, progress * depthFlowLookup.total));
@@ -258,11 +257,7 @@ function DepthBody() {
         if (focusedIndex >= 0) active = focusedIndex;
         const finalRect = sections[3]?.getBoundingClientRect();
         const finalReady = active === 3 && !!finalRect && finalRect.top <= viewport * .08 && finalRect.bottom >= viewport * .92;
-        const finalOffset = finalRect ? finalRect.top - bodyRect.top : 0;
-        const finalEntryProgress = clamp((focus + finalOffset) / denominator, 0, 1);
-        const finalCenterProgress = finalRect ? clamp((finalRect.height * .5 + finalOffset) / denominator, 0, 1) : 1;
-        const finalTravel = finalReady ? clamp((rawProgress - finalEntryProgress) / Math.max(finalCenterProgress - finalEntryProgress, .001), 0, 1) : 0;
-        const flowProgress = finalReady ? depthFlowFinalStart + (finalTravel * (1 - depthFlowFinalStart)) : rawProgress;
+        const flowProgress = finalReady ? 1 : rawProgress;
         setMotion({ active, progress: flowProgress, reveals, finalReady });
       });
     };
