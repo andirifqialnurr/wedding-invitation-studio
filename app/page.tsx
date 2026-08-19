@@ -174,20 +174,26 @@ function BloomBody() {
   return <div className="grand-body grand-body-bloom"><section className="bloom-story reveal" id="story"><div className="grand-number">01</div><div className="bloom-story-copy"><p className="eyebrow">A note from the garden</p><h2>Let the day<br /><i>open slowly.</i></h2><p>Somewhere between a shared umbrella and one more cup of coffee, Nara and Raka found a life worth celebrating in full colour.</p><p>Come as you are. Stay for the vows, the golden hour, and every little petal that falls after.</p></div><img className="bloom-story-art" src="/assets/flowers/bloom-bouquet.png" alt="" /></section><section className="bloom-gallery reveal" id="details"><div className="bloom-gallery-copy"><p className="eyebrow">The visual story</p><h2>Petals, portraits,<br /><i>and a little light.</i></h2><p>Keep the moments that feel soft around the edges. We will make room for all of them.</p></div><figure className="bloom-photo"><img src="/assets/images/bloom-couple.webp" alt="A couple celebrating together" /><figcaption>the people we love / 01</figcaption></figure><img className="bloom-gallery-sprig" src="/assets/flowers/bloom-sprig.png" alt="" /></section><section className="bloom-schedule reveal" id="schedule"><div><p className="eyebrow">A gentle itinerary</p><h2>Come for the<br /><i>whole afternoon.</i></h2></div><div className="bloom-schedule-list"><div><time>15:30</time><span>Garden doors open</span><small>Find a seat and say hello.</small></div><div><time>16:00</time><span>The ceremony</span><small>A short walk, a long promise.</small></div><div><time>17:00</time><span>Golden hour</span><small>Portraits, petals, and something cold to drink.</small></div><div><time>18:30</time><span>Dinner under the trees</span><small>Stay awhile. The best part is just beginning.</small></div></div></section></div>;
 }
 
-const depthFlowPoints = [[15, 4], [72, 28], [28, 52], [78, 76], [46, 97]] as const;
+const depthFlowSegments = [
+  [[15, 4], [74, 9], [85, 19], [72, 28]],
+  [[72, 28], [59, 37], [9, 43], [28, 52]],
+  [[28, 52], [47, 61], [92, 67], [78, 76]],
+  [[78, 76], [64, 85], [25, 91], [46, 97]],
+] as const;
+const depthFlowPoints: readonly (readonly [number, number])[] = [...depthFlowSegments.map((segment) => segment[0]), depthFlowSegments[depthFlowSegments.length - 1][3]];
 
 function depthFlowPoint(progress: number) {
-  const scaled = Math.min(depthFlowPoints.length - 1, Math.max(0, progress * (depthFlowPoints.length - 1)));
-  const index = Math.floor(scaled);
-  const remainder = scaled - index;
-  const from = depthFlowPoints[index];
-  const to = depthFlowPoints[Math.min(index + 1, depthFlowPoints.length - 1)];
-  return { x: from[0] + (to[0] - from[0]) * remainder, y: from[1] + (to[1] - from[1]) * remainder };
+  const scaled = Math.min(depthFlowSegments.length - 1, Math.max(0, progress * depthFlowSegments.length));
+  const index = Math.min(depthFlowSegments.length - 1, Math.floor(scaled));
+  const t = index === depthFlowSegments.length - 1 ? Math.min(1, scaled - index) : scaled - index;
+  const segment = depthFlowSegments[index];
+  const inverse = 1 - t;
+  return { x: (inverse ** 3 * segment[0][0]) + (3 * inverse ** 2 * t * segment[1][0]) + (3 * inverse * t ** 2 * segment[2][0]) + (t ** 3 * segment[3][0]), y: (inverse ** 3 * segment[0][1]) + (3 * inverse ** 2 * t * segment[1][1]) + (3 * inverse * t ** 2 * segment[2][1]) + (t ** 3 * segment[3][1]) };
 }
 
 function DepthFlowGuide({ active, progress }: { active: number; progress: number }) {
   const point = depthFlowPoint(progress);
-  const flowStyle = { "--depth-flow-x": `${point.x}%`, "--depth-flow-y": `${point.y}%`, "--depth-flow-angle": `${progress * 180}deg` } as CSSProperties;
+  const flowStyle = { "--depth-flow-x": `${point.x}%`, "--depth-flow-y": `${point.y}%`, "--depth-flow-angle": `${progress * 180}deg`, "--depth-flow-orb-color": active === 3 ? "#b8ff4d" : "#edf2ef" } as CSSProperties;
   return <div className="depth-flow-guide" style={flowStyle} aria-hidden="true"><svg className="depth-flow-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path className="depth-flow-path-base" pathLength="1" d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 46 97" /><path className="depth-flow-path-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - progress} d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 46 97" /></svg>{depthFlowPoints.slice(0, 4).map(([x, y], index) => <span className={`depth-flow-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="depth-flow-orb" /><span className="depth-flow-label">scroll / connect</span></div>;
 }
 
