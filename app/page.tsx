@@ -229,27 +229,35 @@ function DepthFlowGuide({ active, progress }: { active: number; progress: number
       frame = window.requestAnimationFrame(() => setArrival(null));
       return () => { if (frame) window.cancelAnimationFrame(frame); };
     }
-    const from = progressRef.current;
-    const startedAt = performance.now();
-    const arrive = (now: number) => {
-      const phase = Math.min(1, (now - startedAt) / 720);
-      const eased = 1 - ((1 - phase) ** 3);
-      setArrival(from + ((1 - from) * eased));
-      if (phase < 1) frame = window.requestAnimationFrame(arrive);
-      else setArrival(1);
+    const waitForFullSection = () => {
+      const finalSection = document.querySelector<HTMLElement>("#depth-final");
+      const viewport = window.innerHeight;
+      const rect = finalSection?.getBoundingClientRect();
+      if (!rect || rect.top > viewport * .08 || rect.bottom < viewport * .92) { frame = window.requestAnimationFrame(waitForFullSection); return; }
+      const from = progressRef.current;
+      const startedAt = performance.now();
+      const arrive = (now: number) => {
+        const phase = Math.min(1, (now - startedAt) / 720);
+        const eased = 1 - ((1 - phase) ** 3);
+        setArrival(from + ((1 - from) * eased));
+        if (phase < 1) frame = window.requestAnimationFrame(arrive);
+        else setArrival(1);
+      };
+      frame = window.requestAnimationFrame(arrive);
     };
-    frame = window.requestAnimationFrame(arrive);
+    frame = window.requestAnimationFrame(waitForFullSection);
     return () => { if (frame) window.cancelAnimationFrame(frame); };
   }, [active]);
   const flowProgress = arrival ?? progress;
   const point = depthFlowPoint(flowProgress);
   const settled = active === 3 && arrival === 1;
-  const flowStyle = { "--depth-flow-x": `${point.x}%`, "--depth-flow-y": `${point.y}%`, "--depth-flow-angle": `${flowProgress * 180}deg`, "--depth-flow-orb-color": settled ? "#b8ff4d" : "#edf2ef" } as CSSProperties;
+  const orbColor = active === 1 ? "#101417" : settled ? "#b8ff4d" : "#edf2ef";
+  const flowStyle = { "--depth-flow-x": `${point.x}%`, "--depth-flow-y": `${point.y}%`, "--depth-flow-angle": `${flowProgress * 180}deg`, "--depth-flow-orb-color": orbColor } as CSSProperties;
   return <div className="depth-flow-guide" style={flowStyle} aria-hidden="true"><svg className="depth-flow-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path className="depth-flow-path-base" pathLength="1" d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 50 88" /><path className="depth-flow-path-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - flowProgress} d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 50 88" /></svg>{depthFlowPoints.slice(0, 4).map(([x, y], index) => <span className={`depth-flow-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="depth-flow-orb" /><span className="depth-flow-label">scroll / connect</span></div>;
 }
 
 function DepthBody() {
-  const [motion, setMotion] = useState({ active: 0, progress: 0, reveals: [1, 0, 0, 0] });
+  const [motion, setMotion] = useState({ active: 0, progress: 0, reveals: [1, 0, 0, 0], finalReady: false });
   useEffect(() => {
     let frame = 0;
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -270,9 +278,15 @@ function DepthBody() {
           const rect = section.getBoundingClientRect();
           const nextDistance = Math.abs(rect.top - focus);
           if (nextDistance < distance) { distance = nextDistance; active = index; }
-          return clamp(1 - nextDistance / (viewport * .82), 0, 1);
+          const entry = clamp((focus - rect.top + viewport * .42) / (viewport * .42), 0, 1);
+          const exit = clamp((rect.bottom - focus + viewport * .18) / (viewport * .35), 0, 1);
+          return Math.min(entry, exit);
         });
-        setMotion({ active, progress, reveals });
+        const focusedIndex = sections.findIndex((section) => { const rect = section.getBoundingClientRect(); return rect.top <= focus && rect.bottom >= focus; });
+        if (focusedIndex >= 0) active = focusedIndex;
+        const finalRect = sections[3]?.getBoundingClientRect();
+        const finalReady = active === 3 && !!finalRect && finalRect.top <= viewport * .08 && finalRect.bottom >= viewport * .92;
+        setMotion({ active, progress, reveals, finalReady });
       });
     };
     update();
@@ -280,8 +294,8 @@ function DepthBody() {
     window.addEventListener("resize", update);
     return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); if (frame) window.cancelAnimationFrame(frame); };
   }, []);
-  const sectionStyle = (index: number) => { const reveal = motion.reveals[index] ?? 0; const finalFill = index === 3 && motion.active === 3 ? 1 : 0; return { "--depth-reveal": reveal.toFixed(3), "--depth-section-index": index, "--depth-shape-opacity": .18 + reveal * .62, "--depth-shape-scale": .92 + reveal * .08, "--depth-final-fill": finalFill } as CSSProperties; };
-  const motionStyle = (index: number, x: number, y: number, angle = 0, scale = 1) => { const reveal = motion.reveals[index] ?? 0; const phase = 1 - reveal; return { "--depth-motion-opacity": .45 + reveal * .55, "--depth-motion-x": `${x * phase}px`, "--depth-motion-x-inverse": `${x * phase * -1}px`, "--depth-motion-y": `${y * phase}px`, "--depth-motion-angle": `${angle * phase}deg`, "--depth-motion-angle-inverse": `${angle * phase * -1}deg`, "--depth-motion-scale": 1 - ((1 - scale) * phase) } as CSSProperties; };
+  const sectionStyle = (index: number) => { const reveal = motion.reveals[index] ?? 0; const finalFill = index === 3 && motion.finalReady ? 1 : 0; return { "--depth-reveal": reveal.toFixed(3), "--depth-section-index": index, "--depth-shape-opacity": .18 + reveal * .62, "--depth-shape-scale": .92 + reveal * .08, "--depth-final-fill": finalFill } as CSSProperties; };
+  const motionStyle = (index: number, x: number, y: number, angle = 0, scale = 1) => { const reveal = motion.reveals[index] ?? 0; const phase = 1 - reveal; return { "--depth-motion-opacity": .2 + reveal * .8, "--depth-motion-x": `${x * phase}px`, "--depth-motion-x-inverse": `${x * phase * -1}px`, "--depth-motion-y": `${y * phase}px`, "--depth-motion-angle": `${angle * phase}deg`, "--depth-motion-angle-inverse": `${angle * phase * -1}deg`, "--depth-motion-scale": 1 - ((1 - scale) * phase) } as CSSProperties; };
   return <div className="grand-body grand-body-depth"><DepthFlowGuide active={motion.active} progress={motion.progress} /><section className={`depth-section depth-story-section ${motion.active === 0 ? "is-active" : ""}`} id="story" data-depth-index="0" style={sectionStyle(0)}><div className="depth-section-meta"><span>01 / THE STORY</span><span>keep moving ↓</span></div><div className="depth-section-shape depth-shape-story" /><div className="depth-story-copy depth-motion depth-motion-copy" style={motionStyle(0, -38, 22, -2, .96)}><p className="eyebrow">A modern invitation</p><h2>Start<br /><i>here.</i></h2><p>Five years, one very good idea, and a room full of people who already know why we are here.</p></div><div className="depth-story-stack depth-motion depth-motion-stack" style={motionStyle(0, 38, 34, 3, .95)}><div className="depth-story-back depth-layer-motion" style={motionStyle(0, -18, 14, -3, .98)}>THE<br />BEGINNING</div><div className="depth-story-mid depth-layer-motion" style={motionStyle(0, 12, -22, 4, .98)}><img src="/assets/images/bloom-couple.webp" alt="A couple celebrating together" /><span>THE GLASSHOUSE / 2026</span></div><div className="depth-story-front depth-layer-motion" style={motionStyle(0, -8, 20, -1, .99)}><span>NR / 17.10.26</span><strong>Nara<br /><i>& Raka</i></strong><small>Somewhere between the first hello<br />and the forever after.</small></div></div></section><section className={`depth-section depth-details ${motion.active === 1 ? "is-active" : ""}`} id="details" data-depth-index="1" style={sectionStyle(1)}><div className="depth-section-meta"><span>02 / THE DETAILS</span><span>everything in its place</span></div><div className="depth-section-shape depth-shape-details" /><div className="depth-details-heading depth-motion" style={motionStyle(1, -30, 28, -2, .96)}><p className="eyebrow">Make room for this</p><h2>Everything<br /><i>falls into place.</i></h2></div><div className="depth-detail-grid depth-motion" style={motionStyle(1, 34, 42, 2, .94)}><article style={motionStyle(1, -18, 28, -2, .98)}><span>01 / ARRIVE</span><strong>15:30</strong><p>Find the room, find your people, and settle into the afternoon.</p></article><article style={motionStyle(1, 0, 38, 0, .98)}><span>02 / PROMISE</span><strong>16:00</strong><p>The ceremony begins when the light is exactly right.</p></article><article style={motionStyle(1, 18, 28, 2, .98)}><span>03 / STAY</span><strong>18:30</strong><p>Dinner, dancing, and one more song before the night ends.</p></article></div></section><section className={`depth-section depth-closer ${motion.active === 2 ? "is-active" : ""}`} id="schedule" data-depth-index="2" style={sectionStyle(2)}><div className="depth-section-meta"><span>03 / THE PROGRAMME</span><span>stay for the whole thing</span></div><div className="depth-section-shape depth-shape-schedule" /><div className="depth-closer-mark depth-motion" style={motionStyle(2, -34, 30, -5, .9)}>12<span>—</span>26</div><div className="depth-closer-copy depth-motion" style={motionStyle(2, 34, 24, 2, .96)}><p className="eyebrow">The last frame</p><h2>See you<br /><i>inside.</i></h2><p>Keep a little room in your calendar. We will keep the lights on.</p></div></section><section className={`depth-section depth-final ${motion.active === 3 ? "is-active" : ""}`} id="depth-final" data-depth-index="3" style={sectionStyle(3)}><div className="depth-section-meta"><span>04 / THE AFTERGLOW</span><span>one more frame</span></div><div className="depth-section-shape depth-shape-final" /><div className="depth-final-copy depth-motion" style={motionStyle(3, -30, 26, -2, .96)}><p className="eyebrow">After the ceremony</p><h2>Stay for<br /><i>the good part.</i></h2><p>Vows, dinner, dancing, and all the small details we will remember long after the lights go out.</p></div><span className="depth-final-mark depth-motion" style={motionStyle(3, 28, 20, 3, .94)}>N + R / 2026</span></section></div>;
 }
 
