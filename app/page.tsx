@@ -205,6 +205,7 @@ const depthFlowLookup = (() => {
   });
   return { samples, total: distance };
 })();
+const depthFlowFinalStart = (depthFlowLookup.samples.find((sample) => sample.segment === 3)?.distance ?? 0) / depthFlowLookup.total;
 
 function depthFlowPoint(progress: number) {
   const target = Math.min(depthFlowLookup.total, Math.max(0, progress * depthFlowLookup.total));
@@ -220,40 +221,10 @@ function depthFlowPoint(progress: number) {
 }
 
 function DepthFlowGuide({ active, progress }: { active: number; progress: number }) {
-  const [arrival, setArrival] = useState<number | null>(null);
-  const progressRef = useRef(progress);
-  useEffect(() => { progressRef.current = progress; }, [progress]);
-  useEffect(() => {
-    let frame = 0;
-    if (active !== 3) {
-      frame = window.requestAnimationFrame(() => setArrival(null));
-      return () => { if (frame) window.cancelAnimationFrame(frame); };
-    }
-    const waitForFullSection = () => {
-      const finalSection = document.querySelector<HTMLElement>("#depth-final");
-      const viewport = window.innerHeight;
-      const rect = finalSection?.getBoundingClientRect();
-      if (!rect || rect.top > viewport * .08 || rect.bottom < viewport * .92) { frame = window.requestAnimationFrame(waitForFullSection); return; }
-      const from = progressRef.current;
-      const startedAt = performance.now();
-      const arrive = (now: number) => {
-        const phase = Math.min(1, (now - startedAt) / 720);
-        const eased = 1 - ((1 - phase) ** 3);
-        setArrival(from + ((1 - from) * eased));
-        if (phase < 1) frame = window.requestAnimationFrame(arrive);
-        else setArrival(1);
-      };
-      frame = window.requestAnimationFrame(arrive);
-    };
-    frame = window.requestAnimationFrame(waitForFullSection);
-    return () => { if (frame) window.cancelAnimationFrame(frame); };
-  }, [active]);
-  const flowProgress = arrival ?? progress;
-  const point = depthFlowPoint(flowProgress);
-  const settled = active === 3 && arrival === 1;
-  const orbColor = active === 1 ? "#101417" : settled ? "#b8ff4d" : "#edf2ef";
-  const flowStyle = { "--depth-flow-x": `${point.x}%`, "--depth-flow-y": `${point.y}%`, "--depth-flow-angle": `${flowProgress * 180}deg`, "--depth-flow-orb-color": orbColor } as CSSProperties;
-  return <div className="depth-flow-guide" style={flowStyle} aria-hidden="true"><svg className="depth-flow-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path className="depth-flow-path-base" pathLength="1" d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 50 88" /><path className="depth-flow-path-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - flowProgress} d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 50 88" /></svg>{depthFlowPoints.slice(0, 4).map(([x, y], index) => <span className={`depth-flow-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="depth-flow-orb" /><span className="depth-flow-label">scroll / connect</span></div>;
+  const point = depthFlowPoint(progress);
+  const orbColor = active === 3 ? "#b8ff4d" : active === 1 ? "#101417" : "#edf2ef";
+  const flowStyle = { "--depth-flow-x": `${point.x}%`, "--depth-flow-y": `${point.y}%`, "--depth-flow-angle": `${progress * 180}deg`, "--depth-flow-orb-color": orbColor } as CSSProperties;
+  return <div className="depth-flow-guide" style={flowStyle} aria-hidden="true"><svg className="depth-flow-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path className="depth-flow-path-base" pathLength="1" d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 50 88" /><path className="depth-flow-path-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - progress} d="M15 4 C74 9 85 19 72 28 S9 43 28 52 S92 67 78 76 S25 91 50 88" /></svg>{depthFlowPoints.slice(0, 4).map(([x, y], index) => <span className={`depth-flow-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="depth-flow-orb" /><span className="depth-flow-label">scroll / connect</span></div>;
 }
 
 function DepthBody() {
@@ -271,7 +242,8 @@ function DepthBody() {
         const viewport = window.innerHeight;
         const focus = viewport * .42;
         const bodyRect = body.getBoundingClientRect();
-        const progress = clamp((focus - bodyRect.top) / Math.max(bodyRect.height - viewport * .18, 1), 0, 1);
+        const denominator = Math.max(bodyRect.height - viewport * .18, 1);
+        const rawProgress = clamp((focus - bodyRect.top) / denominator, 0, 1);
         let active = 0;
         let distance = Number.POSITIVE_INFINITY;
         const reveals = sections.map((section, index) => {
@@ -286,7 +258,12 @@ function DepthBody() {
         if (focusedIndex >= 0) active = focusedIndex;
         const finalRect = sections[3]?.getBoundingClientRect();
         const finalReady = active === 3 && !!finalRect && finalRect.top <= viewport * .08 && finalRect.bottom >= viewport * .92;
-        setMotion({ active, progress, reveals, finalReady });
+        const finalOffset = finalRect ? finalRect.top - bodyRect.top : 0;
+        const finalEntryProgress = clamp((focus + finalOffset) / denominator, 0, 1);
+        const finalCenterProgress = finalRect ? clamp((finalRect.height * .5 + finalOffset) / denominator, 0, 1) : 1;
+        const finalTravel = finalReady ? clamp((rawProgress - finalEntryProgress) / Math.max(finalCenterProgress - finalEntryProgress, .001), 0, 1) : 0;
+        const flowProgress = finalReady ? depthFlowFinalStart + (finalTravel * (1 - depthFlowFinalStart)) : rawProgress;
+        setMotion({ active, progress: flowProgress, reveals, finalReady });
       });
     };
     update();
