@@ -277,6 +277,18 @@ function DepthBody() {
 }
 
 const gardenRoutePoints = [[17, 7], [82, 24], [82, 57], [19, 75], [19, 94]] as const;
+const gardenCarouselCards = [
+  { label: "The opening", title: "Soft beginnings", copy: "The first light, the first hello, and every petal opening around us.", image: "/assets/flowers/bloom-cluster.png" },
+  { label: "The details", title: "Good things", copy: "Small details, warm tables, and room for everyone we love.", image: "/assets/flowers/bloom-side-bouquet.png" },
+  { label: "The ceremony", title: "A long promise", copy: "A short walk beneath the trees, then a lifetime in one room.", image: "/assets/flowers/bloom-side-purple.png" },
+  { label: "The afterglow", title: "Stay awhile", copy: "When the lights go low, the best part is only beginning.", image: "/assets/flowers/bloom-side-leaves.png" },
+] as const;
+
+function GardenPetalCarousel() {
+  const [selected, setSelected] = useState(1);
+  const move = (direction: number) => setSelected((current) => (current + direction + gardenCarouselCards.length) % gardenCarouselCards.length);
+  return <section className="garden-carousel-float" aria-label="Floral story carousel"><div className="garden-carousel-heading"><p className="eyebrow">A closer look</p><span>tap a bloom to bring it forward</span></div><div className="garden-carousel-window">{gardenCarouselCards.map((card, index) => { let offset = index - selected; if (offset > 2) offset -= gardenCarouselCards.length; if (offset < -2) offset += gardenCarouselCards.length; const distance = Math.abs(offset); return <button className={`garden-carousel-card ${offset === 0 ? "is-selected" : ""}`} key={card.label} onClick={() => setSelected(index)} style={{ "--garden-card-x": `${offset * 31}vw`, "--garden-card-scale": offset === 0 ? 1.08 : distance === 1 ? .82 : .62, "--garden-card-opacity": offset === 0 ? 1 : distance === 1 ? .72 : .35, "--garden-card-z": 4 - distance } as CSSProperties} type="button"><span className="garden-carousel-image"><img src={card.image} alt="" /></span><span className="garden-carousel-card-copy"><small>{card.label}</small><strong>{card.title}</strong><em>{card.copy}</em></span></button>; })}</div><div className="garden-carousel-controls"><button onClick={() => move(-1)} type="button" aria-label="Previous floral card">←</button><span>{String(selected + 1).padStart(2, "0")} / 04</span><button onClick={() => move(1)} type="button" aria-label="Next floral card">→</button></div></section>;
+}
 
 function gardenRoutePoint(progress: number) {
   const lengths = gardenRoutePoints.slice(1).map((point, index) => Math.hypot(point[0] - gardenRoutePoints[index][0], point[1] - gardenRoutePoints[index][1]));
@@ -293,7 +305,7 @@ function gardenRoutePoint(progress: number) {
 function GardenRouteGuide({ active, progress }: { active: number; progress: number }) {
   const point = gardenRoutePoint(progress);
   const guideStyle = { "--garden-marker-x": `${point.x}%`, "--garden-marker-y": `${point.y}%`, "--garden-marker-rotation": `${progress * 720}deg` } as CSSProperties;
-  return <div className="garden-route-guide" style={guideStyle} aria-hidden="true"><svg className="garden-route-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path className="garden-route-base" pathLength="1" d="M17 7 L82 24 L82 57 L19 75 L19 94" /><path className="garden-route-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - progress} d="M17 7 L82 24 L82 57 L19 75 L19 94" /></svg>{gardenRoutePoints.slice(0, 4).map(([x, y], index) => <span className={`garden-route-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="garden-marker"><span className="garden-marker-petals">{Array.from({ length: 6 }, (_, index) => <i key={index} style={{ "--garden-petal-angle": `${index * 60}deg` } as CSSProperties} />)}</span><b>✿</b></span><span className="garden-route-caption">one path / four chapters</span></div>;
+  return <div className="garden-route-guide" style={guideStyle}><svg className="garden-route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path className="garden-route-base" pathLength="1" d="M17 7 L82 24 L82 57 L19 75 L19 94" /><path className="garden-route-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - progress} d="M17 7 L82 24 L82 57 L19 75 L19 94" /></svg>{gardenRoutePoints.slice(0, 4).map(([x, y], index) => <span className={`garden-route-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} aria-hidden="true" style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="garden-marker" aria-hidden="true"><span className="garden-marker-petals">{Array.from({ length: 6 }, (_, index) => <i key={index} style={{ "--garden-petal-angle": `${index * 60}deg` } as CSSProperties} />)}</span><b>✿</b></span><span className="garden-route-caption" aria-hidden="true">one path / four chapters</span><GardenPetalCarousel /></div>;
 }
 
 function GardenBody() {
