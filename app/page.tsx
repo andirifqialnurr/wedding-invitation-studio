@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, FormEvent, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import { CSSProperties, FormEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth" | "garden";
 type Theme = { id: ThemeId; number: string; label: string; kicker: string; tagline: string; accent: string; soft: string; collection: "editorial" | "grand" };
@@ -289,18 +289,21 @@ const gardenCarouselCards = [
   { label: "The lights", title: "Golden hour", copy: "The softest light arrives when everyone has stopped checking the time.", image: "/assets/flowers/bloom-side-leaves.png" },
   { label: "The return", title: "Home again", copy: "The path turns gently back, carrying a little of the day with us.", image: "/assets/flowers/bloom-sprig.png" },
 ] as const;
+const loopedGardenCarouselCards = [...gardenCarouselCards, ...gardenCarouselCards, ...gardenCarouselCards];
 
 function GardenPetalCarousel() {
-  const [selected, setSelected] = useState(1);
+  const cardCount = gardenCarouselCards.length;
+  const [selected, setSelected] = useState(cardCount + 1);
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const scrollFrame = useRef<number | null>(null);
-  const scrollToCard = (index: number, behavior: ScrollBehavior = "smooth") => {
+  const centerCard = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
     const node = carouselRef.current;
-    const card = node?.children[index] as HTMLElement | undefined;
+    const targetIndex = index < 0 ? cardCount + (((index % cardCount) + cardCount) % cardCount) : index >= loopedGardenCarouselCards.length ? cardCount + (index % cardCount) : index;
+    const card = node?.children[targetIndex] as HTMLElement | undefined;
     if (!node || !card) return;
     node.scrollTo({ left: card.offsetLeft - ((node.clientWidth - card.offsetWidth) / 2), behavior });
-    setSelected(index);
-  };
+    setSelected(targetIndex);
+  }, [cardCount]);
   useEffect(() => {
     const node = carouselRef.current;
     if (!node) return;
@@ -314,18 +317,24 @@ function GardenPetalCarousel() {
         const nextDistance = Math.abs(center - cardCenter);
         if (nextDistance < distance) { distance = nextDistance; closest = index; }
       });
-      setSelected(closest);
+      const centeredIndex = closest < cardCount || closest >= cardCount * 2 ? cardCount + (closest % cardCount) : closest;
+      setSelected(centeredIndex);
+      if (centeredIndex !== closest) {
+        const card = node.children[centeredIndex] as HTMLElement | undefined;
+        if (card) node.scrollTo({ left: card.offsetLeft - ((node.clientWidth - card.offsetWidth) / 2), behavior: "auto" });
+      }
       scrollFrame.current = null;
     };
     const onScroll = () => {
       if (scrollFrame.current === null) scrollFrame.current = window.requestAnimationFrame(updateSelected);
     };
     node.addEventListener("scroll", onScroll, { passive: true });
-    window.requestAnimationFrame(() => scrollToCard(1, "auto"));
+    window.requestAnimationFrame(() => centerCard(cardCount + 1, "auto"));
     return () => { node.removeEventListener("scroll", onScroll); if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current); };
-  }, []);
-  const move = (direction: number) => scrollToCard(Math.min(gardenCarouselCards.length - 1, Math.max(0, selected + direction)));
-  return <section className="garden-carousel-float" aria-label="Floral story carousel"><div className="garden-carousel-heading"><p className="eyebrow">A closer look</p><span>scroll or tap a bloom to bring it forward</span></div><div className="garden-carousel-window" ref={carouselRef}>{gardenCarouselCards.map((card, index) => { const distance = Math.abs(index - selected); return <button className={`garden-carousel-card ${index === selected ? "is-selected" : ""}`} key={card.label} onClick={() => scrollToCard(index)} style={{ "--garden-card-scale": index === selected ? 1.08 : distance === 1 ? .88 : distance === 2 ? .72 : .58, "--garden-card-opacity": index === selected ? 1 : distance === 1 ? .72 : distance === 2 ? .48 : .28, "--garden-card-z": 8 - distance } as CSSProperties} type="button"><span className="garden-carousel-image"><img src={card.image} alt="" /></span><span className="garden-carousel-card-copy"><small>{card.label}</small><strong>{card.title}</strong><em>{card.copy}</em></span></button>; })}</div><div className="garden-carousel-controls"><button onClick={() => move(-1)} type="button" aria-label="Previous floral card">←</button><span>{String(selected + 1).padStart(2, "0")} / 10</span><button onClick={() => move(1)} type="button" aria-label="Next floral card">→</button></div></section>;
+  }, [cardCount, centerCard]);
+  const move = (direction: number) => centerCard(selected + direction);
+  const selectedIndex = ((selected % cardCount) + cardCount) % cardCount;
+  return <section className="garden-carousel-float" aria-label="Floral story carousel"><div className="garden-carousel-heading"><p className="eyebrow">A closer look</p><span>scroll or tap a bloom to bring it forward</span></div><div className="garden-carousel-window" ref={carouselRef}>{loopedGardenCarouselCards.map((card, index) => { const distance = Math.abs(index - selected); return <button className={`garden-carousel-card ${index === selected ? "is-selected" : ""}`} key={`${index}-${card.label}`} onClick={() => centerCard(index)} style={{ "--garden-card-scale": index === selected ? 1.08 : distance === 1 ? .88 : distance === 2 ? .72 : .58, "--garden-card-opacity": index === selected ? 1 : distance === 1 ? .72 : distance === 2 ? .48 : .28, "--garden-card-z": 8 - distance } as CSSProperties} type="button"><span className="garden-carousel-image"><img src={card.image} alt="" /></span><span className="garden-carousel-card-copy"><small>{card.label}</small><strong>{card.title}</strong><em>{card.copy}</em></span></button>; })}</div><div className="garden-carousel-controls"><button onClick={() => move(-1)} type="button" aria-label="Previous floral card">←</button><span>{String(selectedIndex + 1).padStart(2, "0")} / 10</span><button onClick={() => move(1)} type="button" aria-label="Next floral card">→</button></div></section>;
 }
 
 function gardenRoutePoint(progress: number) {
