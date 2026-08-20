@@ -276,39 +276,80 @@ function DepthBody() {
   return <div className="grand-body grand-body-depth"><DepthFlowGuide active={motion.active} progress={motion.progress} /><section className={`depth-section depth-story-section ${motion.active === 0 ? "is-active" : ""}`} id="story" data-depth-index="0" style={sectionStyle(0)}><div className="depth-section-meta"><span>01 / THE STORY</span><span>keep moving ↓</span></div><div className="depth-section-shape depth-shape-story" /><div className="depth-story-copy depth-motion depth-motion-copy" style={motionStyle(0, -38, 22, -2, .96)}><p className="eyebrow">A modern invitation</p><h2>Start<br /><i>here.</i></h2><p>Five years, one very good idea, and a room full of people who already know why we are here.</p></div><div className="depth-story-stack depth-motion depth-motion-stack" style={motionStyle(0, 38, 34, 3, .95)}><div className="depth-story-back depth-layer-motion" style={motionStyle(0, -18, 14, -3, .98)}>THE<br />BEGINNING</div><div className="depth-story-mid depth-layer-motion" style={motionStyle(0, 12, -22, 4, .98)}><img src="/assets/images/bloom-couple.webp" alt="A couple celebrating together" /><span>THE GLASSHOUSE / 2026</span></div><div className="depth-story-front depth-layer-motion" style={motionStyle(0, -8, 20, -1, .99)}><span>NR / 17.10.26</span><strong>Nara<br /><i>& Raka</i></strong><small>Somewhere between the first hello<br />and the forever after.</small></div></div></section><section className={`depth-section depth-details ${motion.active === 1 ? "is-active" : ""}`} id="details" data-depth-index="1" style={sectionStyle(1)}><div className="depth-section-meta"><span>02 / THE DETAILS</span><span>everything in its place</span></div><div className="depth-section-shape depth-shape-details" /><div className="depth-details-heading depth-motion" style={motionStyle(1, -30, 28, -2, .96)}><p className="eyebrow">Make room for this</p><h2>Everything<br /><i>falls into place.</i></h2></div><div className="depth-detail-grid depth-motion" style={motionStyle(1, 34, 42, 2, .94)}><article style={motionStyle(1, -18, 28, -2, .98)}><span>01 / ARRIVE</span><strong>15:30</strong><p>Find the room, find your people, and settle into the afternoon.</p></article><article style={motionStyle(1, 0, 38, 0, .98)}><span>02 / PROMISE</span><strong>16:00</strong><p>The ceremony begins when the light is exactly right.</p></article><article style={motionStyle(1, 18, 28, 2, .98)}><span>03 / STAY</span><strong>18:30</strong><p>Dinner, dancing, and one more song before the night ends.</p></article></div></section><section className={`depth-section depth-closer ${motion.active === 2 ? "is-active" : ""}`} id="schedule" data-depth-index="2" style={sectionStyle(2)}><div className="depth-section-meta"><span>03 / THE PROGRAMME</span><span>stay for the whole thing</span></div><div className="depth-section-shape depth-shape-schedule" /><div className="depth-closer-mark depth-motion" style={motionStyle(2, -34, 30, -5, .9)}>12<span>—</span>26</div><div className="depth-closer-copy depth-motion" style={motionStyle(2, 34, 24, 2, .96)}><p className="eyebrow">The last frame</p><h2>See you<br /><i>inside.</i></h2><p>Keep a little room in your calendar. We will keep the lights on.</p></div></section><section className={`depth-section depth-final ${motion.active === 3 ? "is-active" : ""}`} id="depth-final" data-depth-index="3" style={sectionStyle(3)}><div className="depth-section-meta"><span>04 / THE AFTERGLOW</span><span>one more frame</span></div><div className="depth-section-shape depth-shape-final" /><div className="depth-final-copy depth-motion" style={motionStyle(3, -30, 26, -2, .96)}><p className="eyebrow">After the ceremony</p><h2>Stay for<br /><i>the good part.</i></h2><p>Vows, dinner, dancing, and all the small details we will remember long after the lights go out.</p></div><span className="depth-final-mark depth-motion" style={motionStyle(3, 28, 20, 3, .94)}>N + R / 2026</span></section></div>;
 }
 
-const gardenRoutePoints = [[17, 7], [82, 24], [82, 57], [19, 75], [19, 94]] as const;
 const gardenCarouselCards = [
-  { label: "The opening", title: "Soft beginnings", copy: "The first light, the first hello, and every petal opening around us.", image: "/assets/flowers/bloom-cluster.png" },
-  { label: "The details", title: "Good things", copy: "Small details, warm tables, and room for everyone we love.", image: "/assets/flowers/bloom-side-bouquet.png" },
-  { label: "The ceremony", title: "A long promise", copy: "A short walk beneath the trees, then a lifetime in one room.", image: "/assets/flowers/bloom-side-purple.png" },
-  { label: "The afterglow", title: "Stay awhile", copy: "When the lights go low, the best part is only beginning.", image: "/assets/flowers/bloom-side-leaves.png" },
-  { label: "The welcome", title: "Come closer", copy: "A little more time together, with every familiar face in view.", image: "/assets/flowers/bloom-sprig.png" },
-  { label: "The table", title: "Make room", copy: "Long tables, open windows, and stories that keep finding their way back.", image: "/assets/flowers/bloom-side-bouquet.png" },
-  { label: "The toast", title: "To us", copy: "Raise a glass to the quiet decision that brought everything here.", image: "/assets/flowers/bloom-cluster.png" },
-  { label: "The music", title: "One more song", copy: "Let the evening stretch a little longer beneath the garden lights.", image: "/assets/flowers/bloom-side-purple.png" },
-  { label: "The lights", title: "Golden hour", copy: "The softest light arrives when everyone has stopped checking the time.", image: "/assets/flowers/bloom-side-leaves.png" },
-  { label: "The return", title: "Home again", copy: "The path turns gently back, carrying a little of the day with us.", image: "/assets/flowers/bloom-sprig.png" },
+  { label: "The opening", title: "Soft beginnings", copy: "The first light, the first hello, and every petal opening around us. This is where guests arrive slowly, find familiar faces, and step into the garden before the ceremony begins.", image: "/assets/flowers/bloom-cluster.png" },
+  { label: "The details", title: "Good things", copy: "Small details, warm tables, and room for everyone we love. Every part of the afternoon is kept simple so the people, the vows, and the light can stay in focus.", image: "/assets/flowers/bloom-side-bouquet.png" },
+  { label: "The ceremony", title: "A long promise", copy: "A short walk beneath the trees, then a lifetime in one room. The ceremony is intimate, gentle, and timed for the softest part of the day.", image: "/assets/flowers/bloom-side-purple.png" },
+  { label: "The afterglow", title: "Stay awhile", copy: "When the lights go low, the best part is only beginning. Dinner opens into music, small conversations, and one more reason to stay a little longer.", image: "/assets/flowers/bloom-side-leaves.png" },
+  { label: "The welcome", title: "Come closer", copy: "A little more time together, with every familiar face in view. The welcome hour gives everyone space to arrive, settle in, and feel part of the day.", image: "/assets/flowers/bloom-sprig.png" },
+  { label: "The table", title: "Make room", copy: "Long tables, open windows, and stories that keep finding their way back. Dinner is arranged to feel generous, unhurried, and close to the garden.", image: "/assets/flowers/bloom-side-bouquet.png" },
+  { label: "The toast", title: "To us", copy: "Raise a glass to the quiet decision that brought everything here. The toast is small in shape but full of the people who helped carry the story forward.", image: "/assets/flowers/bloom-cluster.png" },
+  { label: "The music", title: "One more song", copy: "Let the evening stretch a little longer beneath the garden lights. The music begins after dinner and keeps the last part of the night open.", image: "/assets/flowers/bloom-side-purple.png" },
+  { label: "The lights", title: "Golden hour", copy: "The softest light arrives when everyone has stopped checking the time. Portraits, garden corners, and late afternoon shadows all belong to this moment.", image: "/assets/flowers/bloom-side-leaves.png" },
+  { label: "The return", title: "Home again", copy: "The path turns gently back, carrying a little of the day with us. Guests leave with warm lights behind them and the garden still close in memory.", image: "/assets/flowers/bloom-sprig.png" },
 ] as const;
-const loopedGardenCarouselCards = [...gardenCarouselCards, ...gardenCarouselCards, ...gardenCarouselCards];
+const GARDEN_CAROUSEL_LOOP_COUNT = 7;
+const GARDEN_CAROUSEL_MIDDLE_LAYER = Math.floor(GARDEN_CAROUSEL_LOOP_COUNT / 2);
+const loopedGardenCarouselCards = Array.from({ length: GARDEN_CAROUSEL_LOOP_COUNT }, () => gardenCarouselCards).flat();
+const GARDEN_CAROUSEL_FOCUS_OFFSET = .24;
 
 function GardenPetalCarousel() {
   const cardCount = gardenCarouselCards.length;
-  const [selected, setSelected] = useState(cardCount + 1);
+  const middleStart = cardCount * GARDEN_CAROUSEL_MIDDLE_LAYER;
+  const [selected, setSelected] = useState(middleStart);
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const scrollFrame = useRef<number | null>(null);
+  const recenterTimer = useRef<number | null>(null);
+  const isRecentering = useRef(false);
   const centerCard = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
+    if (recenterTimer.current !== null) {
+      window.clearTimeout(recenterTimer.current);
+      recenterTimer.current = null;
+    }
     const node = carouselRef.current;
-    const targetIndex = index < 0 ? cardCount + (((index % cardCount) + cardCount) % cardCount) : index >= loopedGardenCarouselCards.length ? cardCount + (index % cardCount) : index;
+    const targetIndex = index < 0
+      ? middleStart + (((index % cardCount) + cardCount) % cardCount)
+      : index >= loopedGardenCarouselCards.length
+        ? middleStart + (index % cardCount)
+        : index;
     const card = node?.children[targetIndex] as HTMLElement | undefined;
     if (!node || !card) return;
-    node.scrollTo({ left: card.offsetLeft - ((node.clientWidth - card.offsetWidth) / 2), behavior });
+    node.scrollTo({ left: card.offsetLeft - ((node.clientWidth - card.offsetWidth) * GARDEN_CAROUSEL_FOCUS_OFFSET), behavior });
     setSelected(targetIndex);
-  }, [cardCount]);
+  }, [cardCount, middleStart]);
   useEffect(() => {
     const node = carouselRef.current;
     if (!node) return;
+    const clearRecenterTimer = () => {
+      if (recenterTimer.current !== null) {
+        window.clearTimeout(recenterTimer.current);
+        recenterTimer.current = null;
+      }
+    };
+    const scrollToCard = (index: number) => {
+      const card = node.children[index] as HTMLElement | undefined;
+      if (!card) return;
+      isRecentering.current = true;
+      node.scrollTo({ left: card.offsetLeft - ((node.clientWidth - card.offsetWidth) * GARDEN_CAROUSEL_FOCUS_OFFSET), behavior: "auto" });
+      setSelected(index);
+      window.requestAnimationFrame(() => { isRecentering.current = false; });
+    };
+    const scheduleRecenter = (index: number) => {
+      clearRecenterTimer();
+      recenterTimer.current = window.setTimeout(() => {
+        const normalizedIndex = middleStart + (((index % cardCount) + cardCount) % cardCount);
+        if (normalizedIndex !== index) scrollToCard(normalizedIndex);
+        recenterTimer.current = null;
+      }, 260);
+    };
     const updateSelected = () => {
-      const center = node.scrollLeft + (node.clientWidth / 2);
+      if (isRecentering.current) {
+        scrollFrame.current = null;
+        return;
+      }
+      const referenceCard = node.children[0] as HTMLElement | undefined;
+      const referenceWidth = referenceCard?.offsetWidth ?? 0;
+      const center = node.scrollLeft + ((node.clientWidth - referenceWidth) * GARDEN_CAROUSEL_FOCUS_OFFSET) + (referenceWidth / 2);
       let closest = 0;
       let distance = Number.POSITIVE_INFINITY;
       Array.from(node.children).forEach((child, index) => {
@@ -317,42 +358,48 @@ function GardenPetalCarousel() {
         const nextDistance = Math.abs(center - cardCenter);
         if (nextDistance < distance) { distance = nextDistance; closest = index; }
       });
-      const centeredIndex = closest < cardCount || closest >= cardCount * 2 ? cardCount + (closest % cardCount) : closest;
-      setSelected(centeredIndex);
-      if (centeredIndex !== closest) {
-        const card = node.children[centeredIndex] as HTMLElement | undefined;
-        if (card) node.scrollTo({ left: card.offsetLeft - ((node.clientWidth - card.offsetWidth) / 2), behavior: "auto" });
-      }
+      setSelected(closest);
+      if (closest < cardCount || closest >= cardCount * (GARDEN_CAROUSEL_LOOP_COUNT - 1)) scheduleRecenter(closest);
+      else clearRecenterTimer();
       scrollFrame.current = null;
     };
     const onScroll = () => {
       if (scrollFrame.current === null) scrollFrame.current = window.requestAnimationFrame(updateSelected);
     };
     node.addEventListener("scroll", onScroll, { passive: true });
-    window.requestAnimationFrame(() => centerCard(cardCount + 1, "auto"));
-    return () => { node.removeEventListener("scroll", onScroll); if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current); };
-  }, [cardCount, centerCard]);
+    window.requestAnimationFrame(() => centerCard(middleStart, "auto"));
+    return () => {
+      node.removeEventListener("scroll", onScroll);
+      clearRecenterTimer();
+      if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
+    };
+  }, [cardCount, centerCard, middleStart]);
   const move = (direction: number) => centerCard(selected + direction);
   const selectedIndex = ((selected % cardCount) + cardCount) % cardCount;
-  return <section className="garden-carousel-float" aria-label="Floral story carousel"><div className="garden-carousel-heading"><p className="eyebrow">A closer look</p><span>scroll or tap a bloom to bring it forward</span></div><div className="garden-carousel-window" ref={carouselRef}>{loopedGardenCarouselCards.map((card, index) => { const distance = Math.abs(index - selected); return <button className={`garden-carousel-card ${index === selected ? "is-selected" : ""}`} key={`${index}-${card.label}`} onClick={() => centerCard(index)} style={{ "--garden-card-scale": index === selected ? 1.08 : distance === 1 ? .88 : distance === 2 ? .72 : .58, "--garden-card-opacity": index === selected ? 1 : distance === 1 ? .72 : distance === 2 ? .48 : .28, "--garden-card-z": 8 - distance } as CSSProperties} type="button"><span className="garden-carousel-image"><img src={card.image} alt="" /></span><span className="garden-carousel-card-copy"><small>{card.label}</small><strong>{card.title}</strong><em>{card.copy}</em></span></button>; })}</div><div className="garden-carousel-controls"><button onClick={() => move(-1)} type="button" aria-label="Previous floral card">←</button><span>{String(selectedIndex + 1).padStart(2, "0")} / 10</span><button onClick={() => move(1)} type="button" aria-label="Next floral card">→</button></div></section>;
+  const selectedCard = gardenCarouselCards[selectedIndex];
+  return (
+    <section className="garden-carousel-float" aria-label="Floral story carousel">
+      <div className="garden-carousel-heading"><p className="eyebrow">A closer look</p></div>
+      <div className="garden-carousel-stage">
+        <div className="garden-carousel-window" ref={carouselRef}>
+          {loopedGardenCarouselCards.map((card, index) => {
+            const distance = Math.abs(index - selected);
+            return <button className={`garden-carousel-card ${index === selected ? "is-selected" : ""}`} key={`${index}-${card.label}`} onClick={() => centerCard(index)} style={{ "--garden-card-scale": index === selected ? 1.08 : distance === 1 ? .88 : distance === 2 ? .72 : .58, "--garden-card-opacity": index === selected ? 1 : distance === 1 ? .72 : distance === 2 ? .48 : .28, "--garden-card-z": 8 - distance } as CSSProperties} type="button"><span className="garden-carousel-image"><img src={card.image} alt="" /></span><span className="garden-carousel-card-copy"><small>{card.label}</small><strong>{card.title}</strong></span></button>;
+          })}
+        </div>
+        <aside className="garden-carousel-focus-copy" aria-live="polite">
+          <small>{selectedCard.label}</small>
+          <strong>{selectedCard.title}</strong>
+          <p>{selectedCard.copy}</p>
+        </aside>
+      </div>
+      <div className="garden-carousel-controls"><button onClick={() => move(-1)} type="button" aria-label="Previous floral card">←</button><span>{String(selectedIndex + 1).padStart(2, "0")} / 10</span><button onClick={() => move(1)} type="button" aria-label="Next floral card">→</button></div>
+    </section>
+  );
 }
 
-function gardenRoutePoint(progress: number) {
-  const lengths = gardenRoutePoints.slice(1).map((point, index) => Math.hypot(point[0] - gardenRoutePoints[index][0], point[1] - gardenRoutePoints[index][1]));
-  const total = lengths.reduce((sum, length) => sum + length, 0);
-  let distance = Math.max(0, Math.min(total, progress * total));
-  for (let index = 0; index < lengths.length; index += 1) {
-    if (distance <= lengths[index]) { const ratio = lengths[index] ? distance / lengths[index] : 0; return { x: gardenRoutePoints[index][0] + ((gardenRoutePoints[index + 1][0] - gardenRoutePoints[index][0]) * ratio), y: gardenRoutePoints[index][1] + ((gardenRoutePoints[index + 1][1] - gardenRoutePoints[index][1]) * ratio) }; }
-    distance -= lengths[index];
-  }
-  const last = gardenRoutePoints[gardenRoutePoints.length - 1];
-  return { x: last[0], y: last[1] };
-}
-
-function GardenRouteGuide({ active, progress }: { active: number; progress: number }) {
-  const point = gardenRoutePoint(progress);
-  const guideStyle = { "--garden-marker-x": `${point.x}%`, "--garden-marker-y": `${point.y}%`, "--garden-marker-rotation": `${progress * 720}deg` } as CSSProperties;
-  return <div className="garden-route-guide" style={guideStyle}><svg className="garden-route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path className="garden-route-base" pathLength="1" d="M17 7 L82 24 L82 57 L19 75 L19 94" /><path className="garden-route-active" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - progress} d="M17 7 L82 24 L82 57 L19 75 L19 94" /></svg>{gardenRoutePoints.slice(0, 4).map(([x, y], index) => <span className={`garden-route-node ${active === index ? "is-active" : ""}`} key={`${x}-${y}`} aria-hidden="true" style={{ left: `${x}%`, top: `${y}%` }} />)}<span className="garden-marker" aria-hidden="true"><span className="garden-marker-petals">{Array.from({ length: 6 }, (_, index) => <i key={index} style={{ "--garden-petal-angle": `${index * 60}deg` } as CSSProperties} />)}</span><b>✿</b></span><span className="garden-route-caption" aria-hidden="true">one path / four chapters</span><GardenPetalCarousel /></div>;
+function GardenRouteGuide(_props: { active: number; progress: number }) {
+  return <div className="garden-route-guide"><GardenPetalCarousel /></div>;
 }
 
 function GardenBody() {
@@ -393,7 +440,7 @@ function GardenBody() {
   }, []);
   const sectionStyle = (index: number) => ({ "--garden-reveal": motion.reveals[index].toFixed(3), "--garden-rotate": `${(1 - motion.reveals[index]) * (index % 2 ? -3 : 3)}deg` } as CSSProperties);
   const motionStyle = (index: number, x: number, y: number, scale = .96) => { const phase = 1 - (motion.reveals[index] ?? 0); return { "--garden-motion-opacity": .2 + ((1 - phase) * .8), "--garden-motion-x": `${x * phase}px`, "--garden-motion-y": `${y * phase}px`, "--garden-motion-scale": 1 - ((1 - scale) * phase) } as CSSProperties; };
-  return <div className="grand-body grand-body-garden"><GardenRouteGuide active={motion.active} progress={motion.progress} /><section className={`garden-section garden-story ${motion.active === 0 ? "is-active" : ""}`} id="story" style={sectionStyle(0)}><div className="garden-section-meta"><span>01 / THE OPENING</span><span>start on the left</span></div><div className="garden-story-copy garden-motion" style={motionStyle(0, -35, 22)}><p className="eyebrow">A garden in motion</p><h2>Begin where<br /><i>the petals open.</i></h2><p>One path, four chapters, and a day that slowly turns toward the people we love most.</p></div><div className="garden-story-art garden-motion" style={motionStyle(0, 30, 34, .94)}><img src="/assets/flowers/bloom-cluster.png" alt="Watercolor flower cluster" /><span>THE GLASSHOUSE / UBUD</span></div></section><section className={`garden-section garden-details ${motion.active === 1 ? "is-active" : ""}`} id="details" style={sectionStyle(1)}><div className="garden-section-meta"><span>02 / THE DETAILS</span><span>straight through the garden</span></div><div className="garden-details-copy garden-motion" style={motionStyle(1, -30, 25)}><p className="eyebrow">Everything in bloom</p><h2>Make room<br /><i>for the good things.</i></h2></div><div className="garden-detail-list garden-motion" style={motionStyle(1, 30, 35, .95)}><article><span>01 / ARRIVE</span><strong>15:30</strong><p>Find a seat beneath the leaves and settle into the afternoon.</p></article><article><span>02 / PROMISE</span><strong>16:00</strong><p>The ceremony begins when the light turns soft.</p></article><article><span>03 / STAY</span><strong>18:30</strong><p>Dinner, music, and one more song before the night ends.</p></article></div><img className="garden-details-sprig garden-motion" style={motionStyle(1, 18, -20, .9)} src="/assets/flowers/bloom-sprig.png" alt="" /></section><section className={`garden-section garden-schedule ${motion.active === 2 ? "is-active" : ""}`} id="schedule" style={sectionStyle(2)}><div className="garden-section-meta"><span>03 / THE ROUTE</span><span>follow the light</span></div><div className="garden-schedule-art garden-motion" style={motionStyle(2, -28, 30, .92)}><img src="/assets/flowers/bloom-side-purple.png" alt="Watercolor purple flowers" /><span>17 / 10 / 26</span></div><div className="garden-schedule-copy garden-motion" style={motionStyle(2, 32, 24)}><p className="eyebrow">The programme</p><h2>Stay close<br /><i>to the light.</i></h2><div className="garden-schedule-list"><div><time>15:30</time><span>Garden doors open</span></div><div><time>16:00</time><span>The ceremony</span></div><div><time>17:00</time><span>Golden hour portraits</span></div><div><time>18:30</time><span>Dinner under the trees</span></div></div></div></section><section className={`garden-section garden-final ${motion.active === 3 ? "is-active" : ""}`} id="garden-final" style={sectionStyle(3)}><div className="garden-section-meta"><span>04 / THE AFTERGLOW</span><span>return to the left</span></div><img className="garden-final-art garden-motion" style={motionStyle(3, -24, 30, .92)} src="/assets/flowers/bloom-side-leaves.png" alt="Watercolor leaves" /><div className="garden-final-copy garden-motion" style={motionStyle(3, 28, 24)}><p className="eyebrow">The last petal</p><h2>Stay for<br /><i>the afterglow.</i></h2><p>When the path turns home, there will still be music, warm lights, and a little room on the dance floor.</p></div><span className="garden-final-mark garden-motion" style={motionStyle(3, 22, 15)}>N + R / 2026</span></section></div>;
+  return <div className="grand-body grand-body-garden"><GardenRouteGuide active={motion.active} progress={motion.progress} /><section className={`garden-section garden-story ${motion.active === 0 ? "is-active" : ""}`} id="story" style={sectionStyle(0)}><div className="garden-section-meta"><span>01 / THE OPENING</span><span>start on the left</span></div><div className="garden-story-copy garden-motion" style={motionStyle(0, -35, 22)}><p className="eyebrow">A garden in motion</p><h2>Begin where<br /><i>the petals open.</i></h2><p>One path, four chapters, and a day that slowly turns toward the people we love most.</p><div className="garden-story-notes"><article><span>Venue</span><strong>The Glasshouse, Ubud</strong><p>Open garden seating, soft shade, and a view of the late afternoon light.</p></article><article><span>Date</span><strong>17 October 2026</strong><p>Guests are welcome from 15:30 so the ceremony can begin on time.</p></article></div></div><div className="garden-story-art garden-motion" style={motionStyle(0, 30, 34, .94)}><img src="/assets/flowers/bloom-cluster.png" alt="Watercolor flower cluster" /><span>THE GLASSHOUSE / UBUD</span></div></section><section className={`garden-section garden-details ${motion.active === 1 ? "is-active" : ""}`} id="details" style={sectionStyle(1)}><div className="garden-section-meta"><span>02 / THE DETAILS</span><span>straight through the garden</span></div><div className="garden-details-copy garden-motion" style={motionStyle(1, -30, 25)}><p className="eyebrow">Everything in bloom</p><h2>Make room<br /><i>for the good things.</i></h2><p>Come as you are, stay close to the people you know, and leave a little time for the garden walk before dinner.</p></div><div className="garden-detail-list garden-motion" style={motionStyle(1, 30, 35, .95)}><article><span>01 / ARRIVE</span><strong>15:30</strong><p>Find a seat beneath the leaves and settle into the afternoon.</p></article><article><span>02 / PROMISE</span><strong>16:00</strong><p>The ceremony begins when the light turns soft.</p></article><article><span>03 / STAY</span><strong>18:30</strong><p>Dinner, music, and one more song before the night ends.</p></article></div><img className="garden-details-sprig garden-motion" style={motionStyle(1, 18, -20, .9)} src="/assets/flowers/bloom-sprig.png" alt="" /></section><section className={`garden-section garden-schedule ${motion.active === 2 ? "is-active" : ""}`} id="schedule" style={sectionStyle(2)}><div className="garden-section-meta"><span>03 / THE ROUTE</span><span>follow the light</span></div><div className="garden-schedule-art garden-motion" style={motionStyle(2, -28, 30, .92)}><img src="/assets/flowers/bloom-side-purple.png" alt="Watercolor purple flowers" /><span>17 / 10 / 26</span></div><div className="garden-schedule-copy garden-motion" style={motionStyle(2, 32, 24)}><p className="eyebrow">The programme</p><h2>Stay close<br /><i>to the light.</i></h2><div className="garden-schedule-list"><div><time>15:30</time><span>Garden doors open</span></div><div><time>16:00</time><span>The ceremony</span></div><div><time>17:00</time><span>Golden hour portraits</span></div><div><time>18:30</time><span>Dinner under the trees</span></div></div><p className="garden-schedule-note">The route is intentionally simple: welcome, vows, portraits, dinner, then an open evening with music under the trees.</p></div></section><section className={`garden-section garden-final ${motion.active === 3 ? "is-active" : ""}`} id="garden-final" style={sectionStyle(3)}><div className="garden-section-meta"><span>04 / THE AFTERGLOW</span><span>return to the left</span></div><img className="garden-final-art garden-motion" style={motionStyle(3, -24, 30, .92)} src="/assets/flowers/bloom-side-leaves.png" alt="Watercolor leaves" /><div className="garden-final-copy garden-motion" style={motionStyle(3, 28, 24)}><p className="eyebrow">The last petal</p><h2>Stay for<br /><i>the afterglow.</i></h2><p>When the path turns home, there will still be music, warm lights, and a little room on the dance floor.</p><div className="garden-final-highlights"><span>Late dinner</span><span>Garden lights</span><span>Open dance floor</span></div></div><span className="garden-final-mark garden-motion" style={motionStyle(3, 22, 15)}>N + R / 2026</span></section></div>;
 }
 
 function GrandRsvp({ onOpen }: { onOpen: () => void }) {
