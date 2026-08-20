@@ -16,11 +16,11 @@
 
 ## Task 3 - Improve templates 6-10
 
-- [ ] Add stronger constant motion to Aurora, Atlas, Luna, Gallery, and Orbit.
-- [ ] Add scroll-reactive movement to their grand body sections.
-- [ ] Keep template 11-13 behavior as the quality reference.
-- [ ] Validate build and rendered HTML test.
-- [ ] Commit and push after completion.
+- [x] Add stronger constant motion to Aurora, Atlas, Luna, Gallery, and Orbit.
+- [x] Add scroll-reactive movement to their grand body sections.
+- [x] Keep template 11-13 behavior as the quality reference.
+- [x] Validate build and rendered HTML test.
+- [x] Commit and push after completion.
 
 ## Task 4 - Add template 14
 
