@@ -33,9 +33,9 @@
 
 ## Task 5 - Add template 15
 
-- [ ] Add the final new grand template so the studio has 15 templates.
-- [ ] Include a dedicated hero and body, not only a selector entry.
-- [ ] Include constant and scroll-reactive motion.
-- [ ] Update carousel counts and symbols.
-- [ ] Validate build and rendered HTML test.
-- [ ] Commit and push after completion.
+- [x] Add the final new grand template so the studio has 15 templates.
+- [x] Include a dedicated hero and body, not only a selector entry.
+- [x] Include constant and scroll-reactive motion.
+- [x] Update carousel counts and symbols.
+- [x] Validate build and rendered HTML test.
+- [x] Commit and push after completion.

@@ -2,7 +2,7 @@
 
 import { CSSProperties, FormEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth" | "garden" | "vellum";
+type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth" | "garden" | "vellum" | "tide";
 type Theme = { id: ThemeId; number: string; label: string; kicker: string; tagline: string; accent: string; soft: string; collection: "editorial" | "grand" };
 
 const themes: Theme[] = [
@@ -20,6 +20,7 @@ const themes: Theme[] = [
   { id: "depth", number: "12", label: "Depth", kicker: "A story in layers", tagline: "A modern invitation that opens one frame at a time.", accent: "#b8ff4d", soft: "#dbe8ff", collection: "grand" },
   { id: "garden", number: "13", label: "Petal Route", kicker: "A garden in motion", tagline: "A floral invitation carried by one winding path.", accent: "#c77484", soft: "#f3e6d9", collection: "grand" },
   { id: "vellum", number: "14", label: "Vellum", kicker: "Letters in motion", tagline: "Translucent pages, quiet overlays, and a ceremony that unfolds layer by layer.", accent: "#b78b62", soft: "#efe5d5", collection: "grand" },
+  { id: "tide", number: "15", label: "Tide", kicker: "A coastal rhythm", tagline: "Rolling light, shoreline vows, and a celebration that moves like water.", accent: "#45b8a8", soft: "#d7eee9", collection: "grand" },
 ];
 
 const timeline = [
@@ -34,7 +35,7 @@ function ThemeSelector({ active, onChange }: { active: ThemeId; onChange: (id: T
 }
 
 function CarouselArtwork({ theme, compact = false }: { theme: Theme; compact?: boolean }) {
-  return <div className={`carousel-art art-${theme.id} ${compact ? "is-compact" : ""}`}><span className="art-number">{theme.number}</span><span className="art-symbol">{theme.id === "atlas" ? "↗" : theme.id === "luna" ? "☾" : theme.id === "orbit" ? "◎" : theme.id === "gallery" ? "▦" : theme.id === "aurora" ? "✦" : theme.id === "bloom" ? "✿" : theme.id === "depth" ? "◫" : theme.id === "garden" ? "❊" : theme.id === "vellum" ? "▱" : "N + R"}</span></div>;
+  return <div className={`carousel-art art-${theme.id} ${compact ? "is-compact" : ""}`}><span className="art-number">{theme.number}</span><span className="art-symbol">{theme.id === "atlas" ? "↗" : theme.id === "luna" ? "☾" : theme.id === "orbit" ? "◎" : theme.id === "gallery" ? "▦" : theme.id === "aurora" ? "✦" : theme.id === "bloom" ? "✿" : theme.id === "depth" ? "◫" : theme.id === "garden" ? "❊" : theme.id === "vellum" ? "▱" : theme.id === "tide" ? "≈" : "N + R"}</span></div>;
 }
 
 function TemplateCarousel({ active, onChange }: { active: ThemeId; onChange: (id: ThemeId) => void }) {
@@ -79,6 +80,10 @@ function VellumHero({ theme }: { theme: Theme }) {
   return <section className="hero grand-hero grand-vellum reveal" id="invitation"><div className="vellum-grain" /><div className="vellum-topline"><span>{theme.number} / Grand collection</span><span>layered paper motion</span></div><div className="vellum-copy"><p className="eyebrow">{theme.kicker} · 17 October 2026</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="vellum-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Turn the page <span>↓</span></button></div><div className="vellum-pages" aria-hidden="true"><div className="vellum-page vellum-page-back"><span>THE GLASSHOUSE</span></div><div className="vellum-page vellum-page-mid"><img src="/assets/images/bloom-couple.webp" alt="" /></div><div className="vellum-page vellum-page-front"><span>NR</span><strong>14</strong><small>UBUD / BALI</small></div></div><div className="vellum-thread" aria-hidden="true"><span /><span /><span /></div></section>;
 }
 
+function TideHero({ theme }: { theme: Theme }) {
+  return <section className="hero grand-hero grand-tide reveal" id="invitation"><div className="tide-sky" /><div className="tide-topline"><span>{theme.number} / Grand collection</span><span>coastal motion system</span></div><div className="tide-copy"><p className="eyebrow">{theme.kicker} · 17 October 2026</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="tide-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Follow the tide <span>↓</span></button></div><div className="tide-orb" aria-hidden="true"><span>15</span></div><div className="tide-waves" aria-hidden="true"><span /><span /><span /></div><div className="tide-card" aria-hidden="true"><span>THE GLASSHOUSE</span><strong>UBUD</strong><small>16:00 WITA</small></div></section>;
+}
+
 function ModernHero({ theme }: { theme: Theme }) {
   return <section className="hero hero-modern reveal"><div className="modern-stamp">INVITATION<br /><strong>001</strong></div><div className="modern-copy"><p className="eyebrow">{theme.kicker} / 17—10—26</p><h1><span>Nara</span><span className="ampersand">+</span><span>Raka</span></h1><p className="hero-tagline">{theme.tagline}</p><div className="modern-meta"><span>UBUD</span><span>16:00</span><span>RSVP →</span></div></div><div className="modern-shape"><span>26</span><i>save<br />the<br />date</i></div></section>;
 }
@@ -116,7 +121,7 @@ function OrbitHero({ theme }: { theme: Theme }) {
 }
 
 function Hero({ theme }: { theme: Theme }) {
-  switch (theme.id) { case "modern": return <ModernHero theme={theme} />; case "film": return <FilmHero theme={theme} />; case "paper": return <PaperHero theme={theme} />; case "quiet": return <QuietHero theme={theme} />; case "aurora": return <AuroraHero theme={theme} />; case "atlas": return <AtlasHero theme={theme} />; case "luna": return <LunaHero theme={theme} />; case "gallery": return <GalleryHero theme={theme} />; case "orbit": return <OrbitHero theme={theme} />; case "bloom": return <BloomHero theme={theme} />; case "depth": return <DepthHero theme={theme} />; case "garden": return <GardenHero theme={theme} />; case "vellum": return <VellumHero theme={theme} />; default: return <BotanicalHero theme={theme} />; }
+  switch (theme.id) { case "modern": return <ModernHero theme={theme} />; case "film": return <FilmHero theme={theme} />; case "paper": return <PaperHero theme={theme} />; case "quiet": return <QuietHero theme={theme} />; case "aurora": return <AuroraHero theme={theme} />; case "atlas": return <AtlasHero theme={theme} />; case "luna": return <LunaHero theme={theme} />; case "gallery": return <GalleryHero theme={theme} />; case "orbit": return <OrbitHero theme={theme} />; case "bloom": return <BloomHero theme={theme} />; case "depth": return <DepthHero theme={theme} />; case "garden": return <GardenHero theme={theme} />; case "vellum": return <VellumHero theme={theme} />; case "tide": return <TideHero theme={theme} />; default: return <BotanicalHero theme={theme} />; }
 }
 
 function Countdown() {
@@ -452,12 +457,16 @@ function VellumBody() {
   return <div className="grand-body grand-body-vellum"><section className="vellum-story reveal" id="story"><div className="vellum-section-mark">01</div><div className="vellum-section-copy"><p className="eyebrow">A letter from us</p><h2>Every page<br /><i>kept leading here.</i></h2><p>We wanted this invitation to feel like a note passed between hands: transparent, personal, and full of the small details that made the day feel close.</p></div><div className="vellum-note-stack" aria-hidden="true"><span>first coffee</span><span>one promise</span><span>17.10.26</span></div></section><section className="vellum-details reveal" id="details"><div><p className="eyebrow">The details</p><h2>Soft layers,<br /><i>clear plans.</i></h2></div><div className="vellum-detail-grid"><article><span>WHERE</span><strong>The Glasshouse<br />Ubud, Bali</strong></article><article><span>WHEN</span><strong>Saturday<br />17 October 2026</strong></article><article><span>DRESS</span><strong>Garden formal<br />warm neutrals</strong></article></div></section><section className="vellum-schedule reveal" id="schedule"><div className="vellum-schedule-card"><span>15:30</span><strong>Arrive slowly</strong><p>Doors open, paper notes, and a little time to find your table.</p></div><div className="vellum-schedule-card"><span>16:00</span><strong>The promise</strong><p>Vows in the garden, held in the softest part of the afternoon.</p></div><div className="vellum-schedule-card"><span>18:30</span><strong>Dinner glows</strong><p>Shared plates, warm lights, and one last page before the evening opens.</p></div></section></div>;
 }
 
+function TideBody() {
+  return <div className="grand-body grand-body-tide"><section className="tide-story reveal" id="story"><div><p className="eyebrow">A shoreline note</p><h2>The light came in<br /><i>like water.</i></h2><p>Our story has always moved in waves: a first hello, a long pause, and then the easy certainty that this was the person we wanted beside us.</p></div><div className="tide-story-mark" aria-hidden="true"><span>NR</span><strong>15</strong></div></section><section className="tide-details reveal" id="details"><div className="tide-detail-panel"><span>WHERE</span><strong>The Glasshouse<br />Ubud, Bali</strong><p>A garden venue with open air, late light, and enough room for everyone we love.</p></div><div className="tide-detail-panel"><span>WHEN</span><strong>Saturday<br />17 October 2026</strong><p>Guests may arrive from 15:30. The vows begin at 16:00 WITA.</p></div><div className="tide-detail-panel"><span>MOOD</span><strong>Coastal formal<br />soft blue accents</strong><p>Light layers, relaxed tailoring, and comfortable shoes for the evening.</p></div></section><section className="tide-schedule reveal" id="schedule"><div className="tide-schedule-copy"><p className="eyebrow">The tide table</p><h2>Stay with<br /><i>the rhythm.</i></h2></div><div className="tide-timeline"><div><time>15:30</time><span>Arrival current</span></div><div><time>16:00</time><span>Vows by the garden</span></div><div><time>17:30</time><span>Blue hour portraits</span></div><div><time>18:30</time><span>Dinner and dancing</span></div></div></section></div>;
+}
+
 function GrandRsvp({ onOpen }: { onOpen: () => void }) {
   return <section className="grand-rsvp reveal" id="rsvp"><div className="grand-rsvp-ring" /><div className="grand-rsvp-content"><p className="eyebrow">The final chapter is yours</p><h2>Will you<br /><i>be there?</i></h2><p>Save a little room in your calendar and a lot of room on the dance floor.</p><button className="rsvp-button" onClick={onOpen} type="button">Reserve your place <span>↗</span></button></div><span className="grand-rsvp-code">NR—10 / 26</span></section>;
 }
 
 function GrandBody({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
-  return <>{theme.id === "aurora" && <AuroraBody />}{theme.id === "atlas" && <AtlasBody />}{theme.id === "luna" && <LunaBody />}{theme.id === "gallery" && <GalleryBody />}{theme.id === "orbit" && <OrbitBody />}{theme.id === "bloom" && <BloomBody />}{theme.id === "depth" && <DepthBody />}{theme.id === "garden" && <GardenBody />}{theme.id === "vellum" && <VellumBody />}<GrandRsvp onOpen={onOpen} /></>;
+  return <>{theme.id === "aurora" && <AuroraBody />}{theme.id === "atlas" && <AtlasBody />}{theme.id === "luna" && <LunaBody />}{theme.id === "gallery" && <GalleryBody />}{theme.id === "orbit" && <OrbitBody />}{theme.id === "bloom" && <BloomBody />}{theme.id === "depth" && <DepthBody />}{theme.id === "garden" && <GardenBody />}{theme.id === "vellum" && <VellumBody />}{theme.id === "tide" && <TideBody />}<GrandRsvp onOpen={onOpen} /></>;
 }
 
 function RsvpSection({ onOpen }: { onOpen: () => void }) {
