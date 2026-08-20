@@ -24,12 +24,12 @@
 
 ## Task 4 - Add template 14
 
-- [ ] Add a new grand template after Template 13.
-- [ ] Include a dedicated hero and body, not only a selector entry.
-- [ ] Include constant and scroll-reactive motion.
-- [ ] Update carousel counts and symbols.
-- [ ] Validate build and rendered HTML test.
-- [ ] Commit and push after completion.
+- [x] Add a new grand template after Template 13.
+- [x] Include a dedicated hero and body, not only a selector entry.
+- [x] Include constant and scroll-reactive motion.
+- [x] Update carousel counts and symbols.
+- [x] Validate build and rendered HTML test.
+- [x] Commit and push after completion.
 
 ## Task 5 - Add template 15
 
