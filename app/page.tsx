@@ -467,6 +467,27 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const theme = useMemo(() => themes.find((item) => item.id === activeTheme) ?? themes[0], [activeTheme]);
   useEffect(() => { document.documentElement.style.setProperty("--theme-accent", theme.accent); document.documentElement.style.setProperty("--theme-soft", theme.soft); }, [theme]);
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+        const progress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+        document.documentElement.style.setProperty("--template-scroll", progress.toFixed(4));
+        document.documentElement.style.setProperty("--template-scroll-y", `${Math.round(window.scrollY * .08)}px`);
+        document.documentElement.style.setProperty("--template-scroll-inverse", `${Math.round(window.scrollY * -.05)}px`);
+        document.documentElement.style.setProperty("--template-scroll-soft-y", `${Math.round(window.scrollY * .028)}px`);
+        document.documentElement.style.setProperty("--template-scroll-soft-inverse", `${Math.round(window.scrollY * -.022)}px`);
+        document.documentElement.style.setProperty("--template-scroll-micro-y", `${Math.round(window.scrollY * .014)}px`);
+      });
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); if (frame) window.cancelAnimationFrame(frame); };
+  }, []);
   useEffect(() => { const nodes = document.querySelectorAll<HTMLElement>(".reveal"); const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: 0.1 }); nodes.forEach((node) => observer.observe(node)); return () => observer.disconnect(); }, [activeTheme]);
    return <main className={`site-shell theme-${theme.id}`}><header className="site-header"><a className="brand" href="#top" aria-label="Back to top"><span className="brand-mark">N<span>+</span>R</span><span className="brand-name">Wedding Invitation Studio</span></a><nav className="main-nav" aria-label="Main navigation"><a href="#story">Story</a><a href="#details">Details</a><a href="#schedule">Schedule</a><a href="#rsvp">RSVP</a></nav><button className={`music-toggle ${musicOn ? "is-playing" : ""}`} onClick={() => setMusicOn(!musicOn)} type="button"><span className="music-bars"><i /><i /><i /></span>{musicOn ? "Music on" : "Play music"}</button></header><div id="top" />{theme.id === "bloom" && <BloomFloatingOrnaments />}<ThemeSelector active={activeTheme} onChange={setActiveTheme} /><div className="theme-meta"><span>Current direction / <strong>{theme.number} — {theme.label}</strong></span><span>{theme.collection === "grand" ? "Grand modern collection" : "Editorial collection"} <b>↓</b></span></div><Hero theme={theme} />{theme.collection === "grand" ? <GrandBody theme={theme} onOpen={() => setModalOpen(true)} /> : <><StorySection theme={theme} /><EventSection theme={theme} /><TimelineSection /><MomentsSection theme={theme} /><RsvpSection onOpen={() => setModalOpen(true)} /></>}<footer className="site-footer"><Monogram /><span>Made with the people we love in mind.</span><a href="#top">Back to top ↑</a></footer>{modalOpen && <RsvpModal onClose={() => setModalOpen(false)} />}</main>;
 }

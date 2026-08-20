@@ -8,11 +8,11 @@
 
 ## Task 2 - Improve templates 1-5
 
-- [ ] Add constant hero motion for Botanical, Modern, Film, Paper, and Quiet.
-- [ ] Add scroll-reactive motion to the shared editorial sections.
-- [ ] Keep existing wording, routes, RSVP flow, and responsive structure intact.
-- [ ] Validate build and rendered HTML test.
-- [ ] Commit and push after completion.
+- [x] Add constant hero motion for Botanical, Modern, Film, Paper, and Quiet.
+- [x] Add scroll-reactive motion to the shared editorial sections.
+- [x] Keep existing wording, routes, RSVP flow, and responsive structure intact.
+- [x] Validate build and rendered HTML test.
+- [x] Commit and push after completion.
 
 ## Task 3 - Improve templates 6-10
 
