@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Wedding Invitation Studio — Nara & Raka",
-  description: "Five lovingly art-directed wedding invitation directions for Nara and Raka.",
+  description: "Marketplace template undangan digital modern dengan opsi beli template atau pesan dibuatkan.",
   other: { "codex-preview": "development" },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
 };

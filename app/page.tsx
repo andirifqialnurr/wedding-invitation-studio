@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { CSSProperties, FormEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getMarketplaceProduct, orderSteps, servicePackages } from "./marketplace-data";
 
-type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth" | "garden" | "vellum" | "tide";
+type ThemeId = "botanical" | "modern" | "film" | "paper" | "quiet" | "aurora" | "atlas" | "luna" | "gallery" | "orbit" | "bloom" | "depth" | "garden" | "vellum" | "tide" | "curtain" | "folio" | "book" | "signal" | "gridline";
 type Theme = { id: ThemeId; number: string; label: string; kicker: string; tagline: string; accent: string; soft: string; collection: "editorial" | "grand" };
 
 const themes: Theme[] = [
@@ -21,7 +23,14 @@ const themes: Theme[] = [
   { id: "garden", number: "13", label: "Petal Route", kicker: "A garden in motion", tagline: "A floral invitation carried by one winding path.", accent: "#c77484", soft: "#f3e6d9", collection: "grand" },
   { id: "vellum", number: "14", label: "Vellum", kicker: "Letters in motion", tagline: "Translucent pages, quiet overlays, and a ceremony that unfolds layer by layer.", accent: "#b78b62", soft: "#efe5d5", collection: "grand" },
   { id: "tide", number: "15", label: "Tide", kicker: "A coastal rhythm", tagline: "Rolling light, shoreline vows, and a celebration that moves like water.", accent: "#45b8a8", soft: "#d7eee9", collection: "grand" },
+  { id: "curtain", number: "16", label: "Curtain Call", kicker: "A stage-lit invitation", tagline: "Velvet panels, warm footlights, and one dramatic reveal before the celebration begins.", accent: "#e0b15e", soft: "#ead7bd", collection: "grand" },
+  { id: "folio", number: "17", label: "Folio Gate", kicker: "A private keepsake", tagline: "A folded architectural invitation that opens like a quiet gallery door.", accent: "#6d8f7f", soft: "#dde7dc", collection: "grand" },
+  { id: "book", number: "18", label: "Paper Scatter", kicker: "Pages on the table", tagline: "Loose invitation sheets arranged like a collected story, ready to open one page at a time.", accent: "#a85f45", soft: "#ead9c5", collection: "grand" },
+  { id: "signal", number: "19", label: "Signal", kicker: "A kinetic modern invitation", tagline: "Live markers, orbiting details, and tactile controls for a celebration that feels switched on.", accent: "#55f0b2", soft: "#d8eee8", collection: "grand" },
+  { id: "gridline", number: "20", label: "Gridline", kicker: "A modular modern invitation", tagline: "Editorial panels, moving grids, and click-reactive cards arranged like a polished event system.", accent: "#ff715b", soft: "#e9eee8", collection: "grand" },
 ];
+
+const coverThemes = themes.filter((theme) => theme.id === "curtain" || theme.id === "folio");
 
 const timeline = [
   ["15:30", "Garden doors open", "Find a seat, take a breath, and say hello."],
@@ -31,7 +40,7 @@ const timeline = [
 ] as const;
 
 function ThemeSelector({ active, onChange }: { active: ThemeId; onChange: (id: ThemeId) => void }) {
-  return <div className="theme-selector" aria-label="Choose an invitation style"><span className="selector-label">Explore {themes.length} directions</span><div className="theme-pills">{themes.map((theme) => <button className={`theme-pill ${active === theme.id ? "is-active" : ""}`} key={theme.id} onClick={() => onChange(theme.id)} type="button"><span>{theme.number}</span> {theme.label}</button>)}</div></div>;
+  return <div className="theme-selector" aria-label="Choose an invitation style"><span className="selector-label">Explore {themes.length} directions</span><div className="theme-pills">{themes.map((theme) => <span className={`theme-pill-group ${active === theme.id ? "is-active" : ""}`} key={theme.id}><button className="theme-pill" onClick={() => onChange(theme.id)} type="button"><span>{theme.number}</span> {theme.label}</button><Link className="theme-preview-link" href={`/template/${theme.id}`}>Preview</Link></span>)}</div></div>;
 }
 
 function CarouselArtwork({ theme, compact = false }: { theme: Theme; compact?: boolean }) {
@@ -54,7 +63,159 @@ function TemplateCarousel({ active, onChange }: { active: ThemeId; onChange: (id
   </section>;
 }
 
+type MarketplaceFilter = "all" | "grand" | "editorial";
+
+function MarketplaceHeader({ musicOn, onToggleMusic }: { musicOn: boolean; onToggleMusic: () => void }) {
+  return <header className="site-header marketplace-header"><a className="brand" href="#top" aria-label="Back to top"><span className="brand-mark">W<span>+</span>I</span><span className="brand-name">Wedding Invitation Market</span></a><nav className="main-nav" aria-label="Marketplace navigation"><a href="#catalog">Templates</a><a href="#packages">Paket</a><a href="#process">Cara order</a><a href="#preview">Preview</a></nav><a className="market-header-action" href="#catalog">Belanja template</a><button className={`music-toggle ${musicOn ? "is-playing" : ""}`} onClick={onToggleMusic} type="button"><span className="music-bars"><i /><i /><i /></span>{musicOn ? "Music on" : "Preview music"}</button></header>;
+}
+
+function MarketplaceHero({ theme, onChange }: { theme: Theme; onChange: (id: ThemeId) => void }) {
+  const product = getMarketplaceProduct(theme.id);
+  const featured = themes.filter((item) => ["aurora", "garden", "gridline", "book"].includes(item.id));
+  return <section className="market-hero reveal is-visible" id="top" aria-label="Wedding invitation marketplace">
+    <div className="market-hero-copy">
+      <p className="eyebrow">Marketplace undangan digital</p>
+      <h1>Beli template, atau pesan undangan yang dibuatkan.</h1>
+      <p>Browse desain modern, preview langsung, pilih paket pengerjaan, lalu kirim brief acara. Cocok untuk pasangan, wedding planner, dan studio event.</p>
+      <div className="market-hero-actions"><a className="market-primary" href="#catalog">Lihat katalog</a><Link className="market-secondary" href={`/order/${theme.id}`}>Pesan template aktif</Link></div>
+      <div className="market-stats" aria-label="Marketplace highlights"><span><strong>{themes.length}</strong> template live</span><span><strong>2-7</strong> hari produksi</span><span><strong>3</strong> paket layanan</span></div>
+    </div>
+    <div className="market-hero-visual">
+      <div className="market-device">
+        <div className="market-device-top"><span>{product.badge}</span><span>{product.price}</span></div>
+        <CarouselArtwork theme={theme} />
+        <div className="market-device-copy"><small>{theme.number} / {theme.collection}</small><strong>{theme.label}</strong><p>{theme.tagline}</p></div>
+      </div>
+      <div className="market-feature-strip" aria-label="Featured templates">{featured.map((item) => <button className={theme.id === item.id ? "is-active" : ""} key={item.id} onClick={() => onChange(item.id)} type="button"><span>{item.number}</span>{item.label}</button>)}</div>
+    </div>
+  </section>;
+}
+
+function MarketplaceCatalog({ active, filter, onChange, onFilter }: { active: ThemeId; filter: MarketplaceFilter; onChange: (id: ThemeId) => void; onFilter: (filter: MarketplaceFilter) => void }) {
+  const visibleThemes = filter === "all" ? themes : themes.filter((theme) => theme.collection === filter);
+  return <section className="market-catalog reveal" id="catalog">
+    <div className="market-section-head">
+      <div><p className="eyebrow">Katalog template</p><h2>Pilih gaya, preview, lalu checkout.</h2></div>
+      <div className="market-filter" role="group" aria-label="Filter template collection"><button className={filter === "all" ? "is-active" : ""} onClick={() => onFilter("all")} type="button">Semua</button><button className={filter === "grand" ? "is-active" : ""} onClick={() => onFilter("grand")} type="button">Grand</button><button className={filter === "editorial" ? "is-active" : ""} onClick={() => onFilter("editorial")} type="button">Editorial</button></div>
+    </div>
+    <div className="market-grid">{visibleThemes.map((theme) => {
+      const product = getMarketplaceProduct(theme.id);
+      return <article className={`market-card ${active === theme.id ? "is-active" : ""}`} key={theme.id}>
+        <button className="market-card-art" onClick={() => onChange(theme.id)} type="button" aria-label={`Select ${theme.label}`}><CarouselArtwork theme={theme} compact /></button>
+        <div className="market-card-body"><div className="market-card-top"><span>{theme.number}</span><b>{product.badge}</b></div><h3>{theme.label}</h3><p>{theme.tagline}</p><div className="market-card-meta"><span>{product.price}</span><span>{product.delivery}</span></div><div className="market-card-actions"><Link href={`/template/${theme.id}`}>Preview</Link><Link href={`/order/${theme.id}`}>Beli</Link></div></div>
+      </article>;
+    })}</div>
+  </section>;
+}
+
+function MarketplacePackages() {
+  return <section className="market-packages reveal" id="packages">
+    <div className="market-section-head"><div><p className="eyebrow">Paket layanan</p><h2>Beli instan atau minta dibuatkan.</h2></div><p>Semua paket berangkat dari sistem template yang sama, jadi pengerjaan tetap rapi saat konten, visual, dan kebutuhan RSVP bertambah.</p></div>
+    <div className="package-grid">{servicePackages.map((item) => <article className="package-card" key={item.name}><div><span>{item.timeline}</span><h3>{item.name}</h3><strong>{item.price}</strong><p>{item.copy}</p></div><ul>{item.items.map((feature) => <li key={feature}>{feature}</li>)}</ul>{item.name === "Template Ready" ? <a href="#catalog">Pilih template</a> : <Link href="/custom">Minta dibuatkan</Link>}</article>)}</div>
+  </section>;
+}
+
+function MarketplaceProcess() {
+  return <section className="market-process reveal" id="process"><div className="market-process-copy"><p className="eyebrow">Cara order</p><h2>Alur singkat, hasil siap sebar.</h2><p>Halaman ini disiapkan seperti marketplace: pengguna bisa memilih template sendiri atau masuk ke jalur layanan custom.</p></div><div className="process-list">{orderSteps.map(([number, title, copy]) => <div key={number}><span>{number}</span><strong>{title}</strong><p>{copy}</p></div>)}</div></section>;
+}
+
+function MarketplacePreviewIntro({ theme }: { theme: Theme }) {
+  const product = getMarketplaceProduct(theme.id);
+  return <section className="market-preview-intro reveal" id="preview"><div><p className="eyebrow">Live preview</p><h2>Template aktif: <i>{theme.label}</i></h2><p>{product.price} - {product.delivery}. Gunakan selector untuk mengganti preview tanpa meninggalkan halaman marketplace.</p></div><div className="market-preview-actions"><Link href={`/template/${theme.id}`}>Buka full preview</Link><Link href={`/order/${theme.id}`}>Checkout template ini</Link></div></section>;
+}
+
 function Monogram({ label = "N / R" }: { label?: string }) { return <div className="monogram">{label}</div>; }
+
+function OpeningCover({ theme, opening, onOpen }: { theme: Theme; opening: boolean; onOpen: () => void }) {
+  return <section className={`opening-cover opening-${theme.id} ${opening ? "is-opening" : ""}`} aria-label="Invitation cover">
+    <div className="opening-panel opening-panel-left" />
+    <div className="opening-panel opening-panel-right" />
+    <button className="opening-letter" disabled={opening} onClick={onOpen} type="button" aria-label={`Open ${theme.label} invitation`}>
+      <span className="opening-letter-flap" />
+      <span className="opening-letter-stamp">{theme.number}</span>
+      <span className="opening-letter-copy">
+        <small>{theme.kicker}</small>
+        <strong>Nara<br />& Raka</strong>
+        <em>17 October 2026 / The Glasshouse, Ubud</em>
+      </span>
+      <span className="opening-letter-action">Open invitation</span>
+    </button>
+    <div className="opening-preview" aria-hidden="true">
+      {theme.id === "curtain" ? <><span className="opening-stage-light opening-stage-light-a" /><span className="opening-stage-light opening-stage-light-b" /><span className="opening-stage-ring" /></> : <><span className="opening-paper opening-paper-a" /><span className="opening-paper opening-paper-b" /><span className="opening-paper opening-paper-c" /></>}
+    </div>
+  </section>;
+}
+
+const bookPages = [
+  { label: "Cover", title: "Nara & Raka", kicker: "The invitation set", copy: "A gathered set of invitation pages for Saturday, 17 October 2026 at The Glasshouse, Ubud.", detail: "Tap a sheet to focus", meta: ["No. 18", "Ubud, Bali", "17.10.2026"], notes: ["Ceremony at 16:00 WITA", "Dinner and dancing after sunset", "Garden formal dress code"] },
+  { label: "Chapter 01", title: "A note from us", kicker: "Somehow, it was always you.", copy: "We made this collection for the people who know our story best. The day is designed to feel slow, warm, and full of the small details that made us choose each other.", detail: "N + R / 2026", meta: ["First page", "Personal note", "Keep this date"], notes: ["Arrive with enough time for welcome drinks.", "Bring your favourite memory of us for the guest book.", "The evening will move from garden vows to a long table dinner."] },
+  { label: "Chapter 02", title: "The place", kicker: "The Glasshouse, Ubud", copy: "Garden doors open at 15:30. The ceremony begins at 16:00 in the late afternoon light, followed by portraits around the courtyard and dinner under the covered terrace.", detail: "Saturday / Bali", meta: ["15:30 arrival", "16:00 vows", "The Glasshouse"], notes: ["Parking and guest drop-off are available at the front garden.", "The venue is semi-outdoor, so light layers are recommended.", "Please be seated before the processional begins."] },
+  { label: "Chapter 03", title: "The programme", kicker: "Stay for every page.", copy: "The celebration moves in chapters: welcome drinks, vows, family portraits, dinner, speeches, then one long evening of music under the trees.", detail: "15:30 - late", meta: ["15:30 Welcome", "17:00 Portraits", "20:00 Dancing"], notes: ["Cocktails and small bites will be served after the ceremony.", "Dinner starts at 18:30 with shared plates.", "Speeches, cake, and the first dance follow before the open floor."] },
+  { label: "Final page", title: "Will you be there?", kicker: "RSVP", copy: "Save a seat in your calendar and a little room on the dance floor. Reply by 01 September so we can prepare your place at the table.", detail: "Reply by 01 September", meta: ["RSVP needed", "One seat reserved", "Dinner included"], notes: ["Confirm your attendance and guest name.", "Tell us about dietary requirements.", "Use the RSVP button after this page to send your reply."] },
+] as const;
+
+const paperPlacements = [
+  { x: -320, y: -220, rotate: -8, z: 1 },
+  { x: -70, y: -250, rotate: 5, z: 2 },
+  { x: 145, y: -150, rotate: -3, z: 3 },
+  { x: -260, y: 110, rotate: 8, z: 4 },
+  { x: 20, y: 125, rotate: -6, z: 5 },
+] as const;
+
+const focusImages = ["/assets/images/bloom-couple.webp", "/assets/flowers/bloom-cluster.png", "/assets/flowers/bloom-cover-cluster.png", "/assets/flowers/bloom-side-bouquet.png"] as const;
+
+function BookTemplate({ theme }: { theme: Theme; onOpenRsvp: () => void }) {
+  const [focusedPage, setFocusedPage] = useState<number | null>(null);
+  const [focusImage, setFocusImage] = useState(0);
+  const focused = focusedPage === null ? null : bookPages[focusedPage];
+  useEffect(() => {
+    if (focusedPage === null) return;
+    const resetTimer = window.setTimeout(() => setFocusImage(0), 0);
+    const timer = window.setInterval(() => setFocusImage((value) => (value + 1) % focusImages.length), 2200);
+    return () => {
+      window.clearTimeout(resetTimer);
+      window.clearInterval(timer);
+    };
+  }, [focusedPage]);
+  return <section className={`paper-template reveal is-visible ${focused ? "has-focus" : ""}`} id="invitation" aria-label={`${theme.label} invitation`}>
+    <div className="paper-template-topline"><span>{theme.number} / Grand collection</span><span>{focused ? focused.label : `${bookPages.length} loose sheets`}</span></div>
+    <div className="paper-desk">
+      <div className="paper-scatter" aria-label="Invitation page stack">
+        {bookPages.map((item, index) => {
+          const placement = paperPlacements[index];
+          return <button className={`paper-sheet paper-sheet-${index + 1} paper-layout-${index + 1} ${focusedPage === index ? "is-selected" : ""}`} key={item.label} onClick={() => setFocusedPage(index)} style={{ "--paper-x": `${placement.x}px`, "--paper-y": `${placement.y}px`, "--paper-rotate": `${placement.rotate}deg`, "--paper-z": placement.z, "--paper-delay": `${index * 70}ms` } as CSSProperties} type="button" aria-label={`Open ${item.label}`}>
+            {index === 0 && <><img className="paper-sheet-photo" src="/assets/images/bloom-couple.webp" alt="" /><span className="paper-sheet-number">{String(index + 1).padStart(2, "0")}</span><div className="paper-sheet-copy"><small>{item.label}</small><strong>{item.title}</strong><em>{item.detail}</em></div></>}
+            {index === 1 && <><span className="paper-note-mark">N + R</span><small>{item.label}</small><strong>{item.title}</strong><p>{item.kicker}</p><em>{item.detail}</em></>}
+            {index === 2 && <><small>{item.label}</small><div className="paper-map-card"><span>The Glasshouse</span><i>UBUD</i><b>16:00</b></div><strong>{item.title}</strong><div className="paper-sheet-tags">{item.meta.map((meta) => <span key={meta}>{meta}</span>)}</div></>}
+            {index === 3 && <><small>{item.label}</small><strong>{item.title}</strong><ol className="paper-mini-timeline">{item.meta.map((meta) => <li key={meta}>{meta}</li>)}</ol><em>{item.detail}</em></>}
+            {index === 4 && <><span className="paper-rsvp-stamp">RSVP</span><small>{item.label}</small><strong>{item.title}</strong><ul className="paper-mini-check">{item.notes.map((note) => <li key={note}>{note}</li>)}</ul></>}
+          </button>;
+        })}
+      </div>
+      <aside className="paper-intro">
+        <p className="eyebrow">{theme.kicker}</p>
+        <h2>Pick up one<br /><i>loose page.</i></h2>
+        <p>Each sheet is part of the same invitation set, but the layout changes by purpose: cover, personal note, venue, programme, and RSVP.</p>
+        <span>Click any paper to focus it. Close returns to the full scattered set.</span>
+      </aside>
+      {focused && <div className="paper-focus" role="dialog" aria-modal="false" aria-label={`${focused.label} detail`}>
+        <button className="paper-focus-close" onClick={() => setFocusedPage(null)} type="button" aria-label="Close focused page">Close</button>
+        <div className="paper-focus-left">
+          <img src={focusImages[focusImage]} alt="" />
+          <div className="paper-focus-meta">{focused.meta.map((item) => <span key={item}>{item}</span>)}</div>
+        </div>
+        <article className={`paper-focus-right paper-focus-detail-${(focusedPage ?? 0) + 1}`}>
+          {focusedPage === 0 && <><small>{focused.label}</small><h2>{focused.title}</h2><p className="paper-focus-kicker">{focused.kicker}</p><div className="paper-focus-date"><span>Saturday</span><strong>17</strong><span>October 2026</span></div><p>{focused.copy}</p><div className="paper-focus-cover-grid"><span>The Glasshouse</span><span>Ubud, Bali</span><span>16:00 WITA</span></div></>}
+          {focusedPage === 1 && <><small>{focused.label}</small><p className="paper-letter-quote">Somehow, it was always you.</p><div className="paper-letter-columns"><p>We made this page for the people who have watched the story unfold from the beginning.</p><p>Come early, stay close, and bring one memory we can keep after the night ends.</p></div><span className="paper-letter-signature">Nara + Raka</span></>}
+          {focusedPage === 2 && <><small>{focused.label}</small><h2>{focused.title}</h2><div className="paper-venue-panel"><span>Garden venue</span><strong>The Glasshouse</strong><p>Ubud, Bali. Guest arrival starts from 15:30 with seating before the ceremony.</p></div><dl className="paper-venue-list"><div><dt>Arrival</dt><dd>15:30 WITA</dd></div><div><dt>Ceremony</dt><dd>16:00 WITA</dd></div><div><dt>Dress</dt><dd>Garden formal</dd></div></dl></>}
+          {focusedPage === 3 && <><small>{focused.label}</small><h2>{focused.title}</h2><ol className="paper-focus-timeline"><li><time>15:30</time><span>Welcome drinks and guest book</span></li><li><time>16:00</time><span>Garden ceremony</span></li><li><time>17:00</time><span>Portraits and cocktails</span></li><li><time>18:30</time><span>Dinner, speeches, and dancing</span></li></ol></>}
+          {focusedPage === 4 && <><small>{focused.label}</small><h2>{focused.title}</h2><p className="paper-focus-kicker">Reply by 01 September</p><div className="paper-rsvp-panel"><strong>One seat is being saved for you.</strong><p>Please confirm your attendance, guest name, and any dietary requirements before the deadline.</p></div><ul className="paper-rsvp-list"><li>Attendance confirmation</li><li>Guest name</li><li>Meal or dietary note</li></ul></>}
+        </article>
+      </div>}
+    </div>
+    <p className="book-live" aria-live="polite">{focused ? `${focused.label}: ${focused.title}` : "Choose one sheet to open"}</p>
+  </section>;
+}
 
 function BotanicalHero({ theme }: { theme: Theme }) {
   return <section className="hero hero-botanical reveal"><div className="botanical-copy"><p className="eyebrow">{theme.kicker} <span>·</span> 17 October 2026</p><h1>Nara <em>&</em> Raka</h1><p className="hero-tagline">{theme.tagline}</p><button className="underlined-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Open our invitation <span>↗</span></button></div><div className="botanical-art" aria-label="Abstract floral illustration"><div className="leaf leaf-one" /><div className="leaf leaf-two" /><div className="leaf leaf-three" /><div className="flower flower-one" /><div className="flower flower-two" /><div className="portrait-oval"><Monogram label="N ✦ R" /><span>Saturday<br />in Ubud</span></div><span className="art-note">a day to remember</span></div></section>;
@@ -82,6 +243,49 @@ function VellumHero({ theme }: { theme: Theme }) {
 
 function TideHero({ theme }: { theme: Theme }) {
   return <section className="hero grand-hero grand-tide reveal" id="invitation"><div className="tide-sky" /><div className="tide-topline"><span>{theme.number} / Grand collection</span><span>coastal motion system</span></div><div className="tide-copy"><p className="eyebrow">{theme.kicker} · 17 October 2026</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="tide-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Follow the tide <span>↓</span></button></div><div className="tide-orb" aria-hidden="true"><span>15</span></div><div className="tide-waves" aria-hidden="true"><span /><span /><span /></div><div className="tide-card" aria-hidden="true"><span>THE GLASSHOUSE</span><strong>UBUD</strong><small>16:00 WITA</small></div></section>;
+}
+
+function CurtainHero({ theme }: { theme: Theme }) {
+  return <section className="hero grand-hero grand-curtain reveal" id="invitation"><div className="curtain-stage-light" /><div className="curtain-topline"><span>{theme.number} / Grand collection</span><span>curtain reveal template</span></div><div className="curtain-copy"><p className="eyebrow">{theme.kicker} / 17 October 2026</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="curtain-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Take your seat <span>down</span></button></div><div className="curtain-stage-card" aria-hidden="true"><span>THE GLASSHOUSE</span><strong>ACT I</strong><small>UBUD / BALI</small></div><div className="curtain-rails" aria-hidden="true"><span /><span /><span /></div></section>;
+}
+
+function FolioHero({ theme }: { theme: Theme }) {
+  return <section className="hero grand-hero grand-folio reveal" id="invitation"><div className="folio-grid" /><div className="folio-topline"><span>{theme.number} / Grand collection</span><span>folded gate template</span></div><div className="folio-copy"><p className="eyebrow">{theme.kicker} / Saturday</p><h1>Nara<br /><i>& Raka</i></h1><p>{theme.tagline}</p><button className="folio-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Enter the folio <span>down</span></button></div><div className="folio-gate" aria-hidden="true"><span className="folio-panel folio-panel-left">NR</span><span className="folio-panel folio-panel-right">17</span><span className="folio-panel folio-panel-center">UBUD</span></div></section>;
+}
+
+function SignalHero({ theme }: { theme: Theme }) {
+  const [wiggle, setWiggle] = useState(0);
+  const trigger = () => setWiggle((value) => value + 1);
+  return <section className="hero grand-hero grand-signal reveal" id="invitation">
+    <div className="signal-grid" />
+    <div className="signal-scan" />
+    <div className="signal-topline"><span>{theme.number} / Grand collection</span><span>live invitation system</span></div>
+    <div className="signal-copy"><p className="eyebrow">{theme.kicker} / 17 October 2026</p><h1>Signal<br /><i>the yes.</i></h1><p>{theme.tagline}</p><button className="signal-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">Open the sequence <span>down</span></button></div>
+    <button className="signal-core-button" onClick={trigger} type="button" aria-label="Animate Signal monogram">
+      <span className="signal-ring signal-ring-one" />
+      <span className="signal-ring signal-ring-two" />
+      <span key={wiggle} className={`signal-core-mark ${wiggle ? "is-wiggle" : ""}`}>N + R</span>
+      <small>tap to shake</small>
+    </button>
+    <div className="signal-data-strip" aria-hidden="true"><span>UBUD</span><span>16:00</span><span>GLASSHOUSE</span><span>RSVP</span></div>
+    <button className="signal-badge" onClick={trigger} type="button"><span key={`signal-badge-${wiggle}`} className={wiggle ? "is-wiggle" : ""}>17.10.26</span></button>
+  </section>;
+}
+
+function GridlineHero({ theme }: { theme: Theme }) {
+  const [wiggle, setWiggle] = useState(0);
+  const trigger = () => setWiggle((value) => value + 1);
+  return <section className="hero grand-hero grand-gridline reveal" id="invitation">
+    <div className="gridline-field" />
+    <div className="gridline-topline"><span>{theme.number} / Grand collection</span><span>modular event layout</span></div>
+    <div className="gridline-copy"><p className="eyebrow">{theme.kicker} / Saturday</p><h1>Nara<br /><i>Raka</i></h1><p>{theme.tagline}</p><button className="gridline-link" onClick={() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" })} type="button">View the layout <span>down</span></button></div>
+    <div className="gridline-stack">
+      <button key={`grid-main-${wiggle}`} className={`gridline-panel gridline-panel-main ${wiggle ? "is-card-wiggle" : ""}`} onClick={trigger} type="button" aria-label="Animate all Gridline cards"><span>17<br /><small>OCT</small></span></button>
+      <button key={`grid-photo-${wiggle}`} className={`gridline-panel gridline-panel-photo ${wiggle ? "is-card-wiggle" : ""}`} onClick={trigger} type="button" aria-label="Animate all Gridline cards including photo"><img src="/assets/images/bloom-couple.webp" alt="" /></button>
+      <button key={`grid-note-${wiggle}`} className={`gridline-panel gridline-panel-note ${wiggle ? "is-card-wiggle" : ""}`} onClick={trigger} type="button" aria-label="Animate all Gridline cards"><span>Tap card</span><strong>Ubud / Bali</strong></button>
+    </div>
+    <div className="gridline-ticker" aria-hidden="true"><span>NARA + RAKA / THE GLASSHOUSE / 16:00 WITA / RSVP BY 01 SEPTEMBER / </span><span>NARA + RAKA / THE GLASSHOUSE / 16:00 WITA / RSVP BY 01 SEPTEMBER / </span></div>
+  </section>;
 }
 
 function ModernHero({ theme }: { theme: Theme }) {
@@ -121,7 +325,7 @@ function OrbitHero({ theme }: { theme: Theme }) {
 }
 
 function Hero({ theme }: { theme: Theme }) {
-  switch (theme.id) { case "modern": return <ModernHero theme={theme} />; case "film": return <FilmHero theme={theme} />; case "paper": return <PaperHero theme={theme} />; case "quiet": return <QuietHero theme={theme} />; case "aurora": return <AuroraHero theme={theme} />; case "atlas": return <AtlasHero theme={theme} />; case "luna": return <LunaHero theme={theme} />; case "gallery": return <GalleryHero theme={theme} />; case "orbit": return <OrbitHero theme={theme} />; case "bloom": return <BloomHero theme={theme} />; case "depth": return <DepthHero theme={theme} />; case "garden": return <GardenHero theme={theme} />; case "vellum": return <VellumHero theme={theme} />; case "tide": return <TideHero theme={theme} />; default: return <BotanicalHero theme={theme} />; }
+  switch (theme.id) { case "modern": return <ModernHero theme={theme} />; case "film": return <FilmHero theme={theme} />; case "paper": return <PaperHero theme={theme} />; case "quiet": return <QuietHero theme={theme} />; case "aurora": return <AuroraHero theme={theme} />; case "atlas": return <AtlasHero theme={theme} />; case "luna": return <LunaHero theme={theme} />; case "gallery": return <GalleryHero theme={theme} />; case "orbit": return <OrbitHero theme={theme} />; case "bloom": return <BloomHero theme={theme} />; case "depth": return <DepthHero theme={theme} />; case "garden": return <GardenHero theme={theme} />; case "vellum": return <VellumHero theme={theme} />; case "tide": return <TideHero theme={theme} />; case "curtain": return <CurtainHero theme={theme} />; case "folio": return <FolioHero theme={theme} />; case "signal": return <SignalHero theme={theme} />; case "gridline": return <GridlineHero theme={theme} />; default: return <BotanicalHero theme={theme} />; }
 }
 
 function Countdown() {
@@ -461,12 +665,44 @@ function TideBody() {
   return <div className="grand-body grand-body-tide"><section className="tide-story reveal" id="story"><div><p className="eyebrow">A shoreline note</p><h2>The light came in<br /><i>like water.</i></h2><p>Our story has always moved in waves: a first hello, a long pause, and then the easy certainty that this was the person we wanted beside us.</p></div><div className="tide-story-mark" aria-hidden="true"><span>NR</span><strong>15</strong></div></section><section className="tide-details reveal" id="details"><div className="tide-detail-panel"><span>WHERE</span><strong>The Glasshouse<br />Ubud, Bali</strong><p>A garden venue with open air, late light, and enough room for everyone we love.</p></div><div className="tide-detail-panel"><span>WHEN</span><strong>Saturday<br />17 October 2026</strong><p>Guests may arrive from 15:30. The vows begin at 16:00 WITA.</p></div><div className="tide-detail-panel"><span>MOOD</span><strong>Coastal formal<br />soft blue accents</strong><p>Light layers, relaxed tailoring, and comfortable shoes for the evening.</p></div></section><section className="tide-schedule reveal" id="schedule"><div className="tide-schedule-copy"><p className="eyebrow">The tide table</p><h2>Stay with<br /><i>the rhythm.</i></h2></div><div className="tide-timeline"><div><time>15:30</time><span>Arrival current</span></div><div><time>16:00</time><span>Vows by the garden</span></div><div><time>17:30</time><span>Blue hour portraits</span></div><div><time>18:30</time><span>Dinner and dancing</span></div></div></section></div>;
 }
 
+function CurtainBody() {
+  return <div className="grand-body grand-body-curtain"><section className="curtain-story reveal" id="story"><div><p className="eyebrow">Opening night</p><h2>The room quiets<br /><i>before the yes.</i></h2><p>Guests arrive through a warm lobby moment, then the invitation opens into a stage-like celebration with dramatic pacing and clear details.</p></div><div className="curtain-program" aria-hidden="true"><span>ACT I</span><strong>VOWS</strong><small>16:00 WITA</small></div></section><section className="curtain-details reveal" id="details"><article><span>VENUE</span><strong>The Glasshouse, Ubud</strong><p>Soft garden lighting arranged like a private evening performance.</p></article><article><span>DRESS</span><strong>Evening formal</strong><p>Deep neutrals, satin accents, and comfortable shoes for the afterparty.</p></article><article><span>SEATING</span><strong>Open from 15:30</strong><p>Arrive early for welcome drinks before the curtain rises.</p></article></section><section className="curtain-schedule reveal" id="schedule"><p className="eyebrow">Programme</p><div><time>15:30</time><span>Lobby drinks</span></div><div><time>16:00</time><span>Ceremony curtain</span></div><div><time>18:30</time><span>Dinner and speeches</span></div><div><time>20:00</time><span>Encore dancing</span></div></section></div>;
+}
+
+function FolioBody() {
+  return <div className="grand-body grand-body-folio"><section className="folio-story reveal" id="story"><div className="folio-section-index">01</div><div><p className="eyebrow">A folded note</p><h2>Open each panel<br /><i>and keep the date.</i></h2><p>This template treats the invitation like a collected object: measured, tactile, and built around panels that reveal the story piece by piece.</p></div><div className="folio-object" aria-hidden="true"><span>NR</span><strong>17</strong><small>PRIVATE FOLIO</small></div></section><section className="folio-details reveal" id="details"><div><span>WHERE</span><strong>The Glasshouse<br />Ubud, Bali</strong></div><div><span>WHEN</span><strong>Saturday<br />17 October 2026</strong></div><div><span>NOTE</span><strong>Garden formal<br />muted greens</strong></div></section><section className="folio-schedule reveal" id="schedule"><div className="folio-schedule-copy"><p className="eyebrow">Inside the folio</p><h2>A quiet sequence<br /><i>for the day.</i></h2></div><div className="folio-schedule-list"><div><time>15:30</time><span>Welcome panel</span></div><div><time>16:00</time><span>The promise</span></div><div><time>17:30</time><span>Portrait interval</span></div><div><time>18:30</time><span>Dinner fold</span></div></div></section></div>;
+}
+
+function SignalBody() {
+  const [active, setActive] = useState(0);
+  const cards = [
+    ["01", "First ping", "A short note arrives before the ceremony: come early, keep your phone away, and settle into the garden light."],
+    ["02", "Live venue", "The Glasshouse opens from 15:30 with a welcome bar, seating guides, and a quiet corner for family portraits."],
+    ["03", "Final send", "Dinner starts at 18:30, speeches are kept warm and brief, then the dance floor opens without another announcement."],
+  ] as const;
+  return <div className="grand-body grand-body-signal">
+    <section className="signal-story reveal" id="story"><div className="signal-story-meter" aria-hidden="true"><span /><span /><span /><span /></div><div><p className="eyebrow">A modern pulse</p><h2>Every signal<br /><i>points here.</i></h2><p>Nara and Raka wanted the invitation to feel alive: part announcement, part event console, with small moments that respond when guests interact.</p></div><aside><strong>19</strong><span>active template</span><p>Inspired by orbit motion, live markers, and the layered pace of the newer grand templates.</p></aside></section>
+    <section className="signal-details reveal" id="details">{cards.map((card, index) => <button className={`signal-detail-card ${active === index ? "is-active" : ""}`} key={card[0]} onClick={() => setActive(index)} type="button"><small>{card[0]}</small><strong key={`signal-card-${active}-${index}`} className={active === index ? "is-wiggle" : ""}>{card[1]}</strong><p>{card[2]}</p></button>)}</section>
+    <section className="signal-schedule reveal" id="schedule"><div><p className="eyebrow">Transmission plan</p><h2>Clear timing,<br /><i>no static.</i></h2></div><div className="signal-schedule-console"><div><time>15:30</time><span>Doors online</span><p>Welcome drinks, seating checks, and one slow walk through the garden.</p></div><div><time>16:00</time><span>Vows live</span><p>The ceremony begins with family close and the afternoon light behind us.</p></div><div><time>18:30</time><span>Dinner channel</span><p>Shared plates, speeches, cake, and a late playlist under warm fixtures.</p></div></div></section>
+  </div>;
+}
+
+function GridlineBody() {
+  const [active, setActive] = useState("venue");
+  const [reelWiggle, setReelWiggle] = useState(0);
+  return <div className="grand-body grand-body-gridline">
+    <section className="gridline-story reveal" id="story"><div className="gridline-story-card"><span>01</span><h2>Designed like<br /><i>a keepsake system.</i></h2></div><div className="gridline-story-copy"><p className="eyebrow">Modern editorial</p><p>This layout borrows the confidence of gallery cards, the order of folio panels, and the tactile feeling of paper blocks, then tightens them into a clean modern invitation.</p><p>Every section uses a different composition: a large opening card, a selectable information board, and a stacked day plan.</p></div><button className="gridline-photo-reel" onClick={() => setReelWiggle((value) => value + 1)} type="button" aria-label="Animate vertical wedding photo reel"><span className="gridline-reel-label">Photo reel</span><span key={reelWiggle} className={`gridline-photo-track ${reelWiggle ? "is-reel-wiggle" : ""}`}><span className="gridline-reel-frame"><img src="/assets/images/bloom-couple.webp" alt="" /></span><span className="gridline-reel-frame gridline-reel-type"><strong>N + R</strong><small>17 OCT</small></span><span className="gridline-reel-frame"><img src="/assets/flowers/bloom-cluster.png" alt="" /></span><span className="gridline-reel-frame gridline-reel-note"><strong>UBUD</strong><small>soft light</small></span><span className="gridline-reel-frame"><img src="/assets/flowers/bloom-cover-cluster.png" alt="" /></span><span className="gridline-reel-frame"><img src="/assets/images/bloom-couple.webp" alt="" /></span><span className="gridline-reel-frame gridline-reel-type"><strong>N + R</strong><small>17 OCT</small></span><span className="gridline-reel-frame"><img src="/assets/flowers/bloom-cluster.png" alt="" /></span><span className="gridline-reel-frame gridline-reel-note"><strong>UBUD</strong><small>soft light</small></span><span className="gridline-reel-frame"><img src="/assets/flowers/bloom-cover-cluster.png" alt="" /></span></span></button></section>
+    <section className="gridline-details reveal" id="details"><div className="gridline-background-carousel" aria-hidden="true"><div className="gridline-background-track"><span>Venue / The Glasshouse</span><span>Dress / Garden formal</span><span>Arrival / 15:30</span><span>Vows / 16:00</span><span>Dinner / 18:30</span><span>RSVP / 01 September</span><span>Venue / The Glasshouse</span><span>Dress / Garden formal</span><span>Arrival / 15:30</span><span>Vows / 16:00</span><span>Dinner / 18:30</span><span>RSVP / 01 September</span></div><div className="gridline-background-track gridline-background-track-alt"><span>Ubud, Bali</span><span>Modern neutrals</span><span>Welcome drinks</span><span>Garden ceremony</span><span>Shared plates</span><span>Late playlist</span><span>Ubud, Bali</span><span>Modern neutrals</span><span>Welcome drinks</span><span>Garden ceremony</span><span>Shared plates</span><span>Late playlist</span></div></div><div className="gridline-detail-foreground"><div className="gridline-detail-tabs"><button className={active === "venue" ? "is-active" : ""} onClick={() => setActive("venue")} type="button">Venue</button><button className={active === "dress" ? "is-active" : ""} onClick={() => setActive("dress")} type="button">Dress</button><button className={active === "note" ? "is-active" : ""} onClick={() => setActive("note")} type="button">Note</button></div><article className="gridline-detail-board"><span key={active} className="is-wiggle">{active === "venue" ? "The Glasshouse / Ubud, Bali" : active === "dress" ? "Modern garden formal" : "Please arrive before 16:00"}</span><p>{active === "venue" ? "A semi-outdoor venue with an open garden ceremony, covered dinner area, and a late-night music corner." : active === "dress" ? "Structured silhouettes, calm neutrals, black, white, moss, silver, and one confident accent color are welcome." : "The day is intentionally paced. Give yourself time for welcome drinks and a seat before the processional."}</p></article></div></section>
+    <section className="gridline-schedule reveal" id="schedule"><p className="eyebrow">Ordered cards</p><div className="gridline-schedule-stack"><article><time>15:30</time><strong>Arrival</strong><p>Guest list check, welcome drink, and family table markers.</p></article><article><time>16:00</time><strong>Ceremony</strong><p>Garden vows, short reading, and a group photo before sunset.</p></article><article><time>18:30</time><strong>Dinner</strong><p>Shared plates, speeches, first dance, and a slow open floor.</p></article><article><time>20:30</time><strong>Afterglow</strong><p>Late playlist, dessert station, and one last toast before closing.</p></article></div></section>
+  </div>;
+}
+
 function GrandRsvp({ onOpen }: { onOpen: () => void }) {
   return <section className="grand-rsvp reveal" id="rsvp"><div className="grand-rsvp-ring" /><div className="grand-rsvp-content"><p className="eyebrow">The final chapter is yours</p><h2>Will you<br /><i>be there?</i></h2><p>Save a little room in your calendar and a lot of room on the dance floor.</p><button className="rsvp-button" onClick={onOpen} type="button">Reserve your place <span>↗</span></button></div><span className="grand-rsvp-code">NR—10 / 26</span></section>;
 }
 
 function GrandBody({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
-  return <>{theme.id === "aurora" && <AuroraBody />}{theme.id === "atlas" && <AtlasBody />}{theme.id === "luna" && <LunaBody />}{theme.id === "gallery" && <GalleryBody />}{theme.id === "orbit" && <OrbitBody />}{theme.id === "bloom" && <BloomBody />}{theme.id === "depth" && <DepthBody />}{theme.id === "garden" && <GardenBody />}{theme.id === "vellum" && <VellumBody />}{theme.id === "tide" && <TideBody />}<GrandRsvp onOpen={onOpen} /></>;
+  return <>{theme.id === "aurora" && <AuroraBody />}{theme.id === "atlas" && <AtlasBody />}{theme.id === "luna" && <LunaBody />}{theme.id === "gallery" && <GalleryBody />}{theme.id === "orbit" && <OrbitBody />}{theme.id === "bloom" && <BloomBody />}{theme.id === "depth" && <DepthBody />}{theme.id === "garden" && <GardenBody />}{theme.id === "vellum" && <VellumBody />}{theme.id === "tide" && <TideBody />}{theme.id === "curtain" && <CurtainBody />}{theme.id === "folio" && <FolioBody />}{theme.id === "signal" && <SignalBody />}{theme.id === "gridline" && <GridlineBody />}<GrandRsvp onOpen={onOpen} /></>;
 }
 
 function RsvpSection({ onOpen }: { onOpen: () => void }) {
@@ -479,10 +715,14 @@ function RsvpModal({ onClose }: { onClose: () => void }) {
   return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><div className="rsvp-modal" role="dialog" aria-modal="true" aria-labelledby="rsvp-title"><button className="modal-close" onClick={onClose} type="button" aria-label="Close RSVP">×</button>{sent ? <div className="success-state"><span className="success-icon">✦</span><p className="eyebrow">You are on the list</p><h2>Thank you,<br /><i>we’ll see you there.</i></h2><p>Your RSVP has been tucked safely into our little wedding plans.</p><button className="text-link" onClick={onClose} type="button">Close this note ↗</button></div> : <><p className="eyebrow">A tiny favor</p><h2 id="rsvp-title">Will you<br /><i>join us?</i></h2><form onSubmit={submit}><label>Your name<input required name="name" placeholder="Type your name" /></label><label>Will you be there?<select defaultValue="yes" name="attendance"><option value="yes">Joyfully, yes!</option><option value="maybe">I’m not sure yet</option><option value="no">Sending love from afar</option></select></label><label>A note for us <textarea name="note" placeholder="Leave a little message (optional)" rows={3} /></label><button className="rsvp-button" type="submit">Send RSVP <span>↗</span></button></form></>}</div></div>;
 }
 
-export default function Home() {
-  const [activeTheme, setActiveTheme] = useState<ThemeId>("aurora");
+export default function Home({ initialThemeId = "aurora", previewOnly = false }: { initialThemeId?: string; previewOnly?: boolean } = {}) {
+  const initialTheme = (themes.some((item) => item.id === initialThemeId) ? initialThemeId : "aurora") as ThemeId;
+  const [activeTheme, setActiveTheme] = useState<ThemeId>(initialTheme);
+  const [invitationOpen, setInvitationOpen] = useState(false);
+  const [coverOpening, setCoverOpening] = useState(false);
   const [musicOn, setMusicOn] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [catalogFilter, setCatalogFilter] = useState<MarketplaceFilter>("all");
   const theme = useMemo(() => themes.find((item) => item.id === activeTheme) ?? themes[0], [activeTheme]);
   useEffect(() => { document.documentElement.style.setProperty("--theme-accent", theme.accent); document.documentElement.style.setProperty("--theme-soft", theme.soft); }, [theme]);
   useEffect(() => {
@@ -506,6 +746,49 @@ export default function Home() {
     window.addEventListener("resize", update);
     return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); if (frame) window.cancelAnimationFrame(frame); };
   }, []);
-  useEffect(() => { const nodes = document.querySelectorAll<HTMLElement>(".reveal"); const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: 0.1 }); nodes.forEach((node) => observer.observe(node)); return () => observer.disconnect(); }, [activeTheme]);
-   return <main className={`site-shell theme-${theme.id}`}><header className="site-header"><a className="brand" href="#top" aria-label="Back to top"><span className="brand-mark">N<span>+</span>R</span><span className="brand-name">Wedding Invitation Studio</span></a><nav className="main-nav" aria-label="Main navigation"><a href="#story">Story</a><a href="#details">Details</a><a href="#schedule">Schedule</a><a href="#rsvp">RSVP</a></nav><button className={`music-toggle ${musicOn ? "is-playing" : ""}`} onClick={() => setMusicOn(!musicOn)} type="button"><span className="music-bars"><i /><i /><i /></span>{musicOn ? "Music on" : "Play music"}</button></header><div id="top" />{theme.id === "bloom" && <BloomFloatingOrnaments />}<ThemeSelector active={activeTheme} onChange={setActiveTheme} /><div className="theme-meta"><span>Current direction / <strong>{theme.number} — {theme.label}</strong></span><span>{theme.collection === "grand" ? "Grand modern collection" : "Editorial collection"} <b>↓</b></span></div><Hero theme={theme} />{theme.collection === "grand" ? <GrandBody theme={theme} onOpen={() => setModalOpen(true)} /> : <><StorySection theme={theme} /><EventSection theme={theme} /><TimelineSection /><MomentsSection theme={theme} /><RsvpSection onOpen={() => setModalOpen(true)} /></>}<footer className="site-footer"><Monogram /><span>Made with the people we love in mind.</span><a href="#top">Back to top ↑</a></footer>{modalOpen && <RsvpModal onClose={() => setModalOpen(false)} />}</main>;
+  useEffect(() => {
+    const resetTimer = window.setTimeout(() => {
+      setInvitationOpen(false);
+      setCoverOpening(false);
+    }, 0);
+    return () => window.clearTimeout(resetTimer);
+  }, [activeTheme]);
+  useEffect(() => { const nodes = document.querySelectorAll<HTMLElement>(".reveal"); const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: 0.1 }); nodes.forEach((node) => observer.observe(node)); return () => observer.disconnect(); }, [activeTheme, invitationOpen]);
+  const openInvitation = () => {
+    if (coverOpening) return;
+    setCoverOpening(true);
+    window.setTimeout(() => {
+      setInvitationOpen(true);
+      setCoverOpening(false);
+    }, 980);
+  };
+  const hasOpeningCover = coverThemes.some((item) => item.id === theme.id);
+  const templateContent = theme.id === "book" ? <BookTemplate theme={theme} onOpenRsvp={() => setModalOpen(true)} /> : hasOpeningCover && !invitationOpen ? <OpeningCover theme={theme} opening={coverOpening} onOpen={openInvitation} /> : <>{theme.collection === "grand" ? <><Hero theme={theme} /><GrandBody theme={theme} onOpen={() => setModalOpen(true)} /></> : <><Hero theme={theme} /><StorySection theme={theme} /><EventSection theme={theme} /><TimelineSection /><MomentsSection theme={theme} /><RsvpSection onOpen={() => setModalOpen(true)} /></>}</>;
+  if (!previewOnly) {
+    return <main className={`site-shell theme-${theme.id} marketplace-page`}>
+      <MarketplaceHeader musicOn={musicOn} onToggleMusic={() => setMusicOn(!musicOn)} />
+      {theme.id === "bloom" && <BloomFloatingOrnaments />}
+      <MarketplaceHero theme={theme} onChange={setActiveTheme} />
+      <MarketplaceCatalog active={activeTheme} filter={catalogFilter} onChange={setActiveTheme} onFilter={setCatalogFilter} />
+      <MarketplacePackages />
+      <MarketplaceProcess />
+      <TemplateCarousel active={activeTheme} onChange={setActiveTheme} />
+      <MarketplacePreviewIntro theme={theme} />
+      <ThemeSelector active={activeTheme} onChange={setActiveTheme} />
+      <div className="theme-meta"><span>Current direction / <strong>{theme.number} - {theme.label}</strong></span><span>{hasOpeningCover && !invitationOpen ? "Click the invitation to enter" : theme.collection === "grand" ? "Grand modern collection" : "Editorial collection"} <b>v</b></span></div>
+      {templateContent}
+      <footer className="site-footer"><Monogram label="W / I" /><span>Marketplace-ready wedding invitation studio.</span><a href="#top">Back to top</a></footer>
+      {modalOpen && <RsvpModal onClose={() => setModalOpen(false)} />}
+    </main>;
+  }
+   return <main className={`site-shell theme-${theme.id} ${previewOnly ? "is-template-preview" : ""}`}>
+    {previewOnly ? <Link className="template-back-button" href="/" aria-label="Back to template list">Back to templates</Link> : <header className="site-header"><a className="brand" href="#top" aria-label="Back to top"><span className="brand-mark">N<span>+</span>R</span><span className="brand-name">Wedding Invitation Studio</span></a><nav className="main-nav" aria-label="Main navigation"><a href="#story">Story</a><a href="#details">Details</a><a href="#schedule">Schedule</a><a href="#rsvp">RSVP</a></nav><button className={`music-toggle ${musicOn ? "is-playing" : ""}`} onClick={() => setMusicOn(!musicOn)} type="button"><span className="music-bars"><i /><i /><i /></span>{musicOn ? "Music on" : "Play music"}</button></header>}
+    <div id="top" />
+    {!previewOnly && theme.id === "bloom" && <BloomFloatingOrnaments />}
+    {!previewOnly && <ThemeSelector active={activeTheme} onChange={setActiveTheme} />}
+    {!previewOnly && <div className="theme-meta"><span>Current direction / <strong>{theme.number} — {theme.label}</strong></span><span>{hasOpeningCover && !invitationOpen ? "Click the invitation to enter" : theme.collection === "grand" ? "Grand modern collection" : "Editorial collection"} <b>↓</b></span></div>}
+    {templateContent}
+    {!previewOnly && <footer className="site-footer"><Monogram /><span>Made with the people we love in mind.</span><a href="#top">Back to top ↑</a></footer>}
+    {modalOpen && <RsvpModal onClose={() => setModalOpen(false)} />}
+  </main>;
 }
